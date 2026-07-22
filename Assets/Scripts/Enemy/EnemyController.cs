@@ -12,6 +12,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private EnemyVision enemyVision;
     [SerializeField] private EnemyChase enemyChase;
 
+    [Header("開始状態")]
+    [SerializeField] private bool startWithChase;
+
     [Header("見失い設定")]
     [SerializeField] private float loseSightTime = 3.0f;
 
@@ -20,7 +23,14 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        ChangeState(EnemyState.Patrol);
+        if (startWithChase)
+        {
+            ChangeState(EnemyState.Chase);
+        }
+        else
+        {
+            ChangeState(EnemyState.Patrol);
+        }
     }
 
     private void Update()
@@ -51,17 +61,14 @@ public class EnemyController : MonoBehaviour
     {
         enemyChase.UpdateChase();
 
-        // プレイヤーが見えている間はタイマーをリセット
         if (enemyVision.CanSeePlayer())
         {
             loseSightTimer = 0.0f;
             return;
         }
 
-        // プレイヤーが見えなくなった時間を数える
         loseSightTimer += Time.deltaTime;
 
-        // 設定した時間以上見失ったら巡回へ戻る
         if (loseSightTimer >= loseSightTime)
         {
             ChangeState(EnemyState.Patrol);

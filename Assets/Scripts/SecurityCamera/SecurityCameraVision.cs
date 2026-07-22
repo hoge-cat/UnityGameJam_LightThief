@@ -5,6 +5,7 @@ public class SecurityCameraVision : MonoBehaviour
     [Header("参照")]
     [SerializeField] private Transform visionOrigin;
     [SerializeField] private Transform player;
+    [SerializeField] private ViewConeVisualizer viewConeVisualizer;
 
     [Header("視野設定")]
     [SerializeField] private float detectionDistance = 8.0f;
@@ -14,11 +15,53 @@ public class SecurityCameraVision : MonoBehaviour
     [Header("障害物設定")]
     [SerializeField] private LayerMask obstacleLayer;
 
+    [Header("警戒設定")]
+    [SerializeField] private float alertTime = 1.0f;
+
+    private float detectionTimer;
+
     private bool canSeePlayer;
 
     private void Update()
     {
-        canSeePlayer = CheckCanSeePlayer();
+        bool isPlayerVisible = CheckCanSeePlayer();
+
+        if (isPlayerVisible)
+        {
+            detectionTimer += Time.deltaTime;
+
+            if (detectionTimer >= alertTime)
+            {
+                canSeePlayer = true;
+
+                if (viewConeVisualizer != null)
+                {
+                    viewConeVisualizer.SetViewState(
+                        ViewConeVisualizer.ViewState.Alert);
+                }
+            }
+            else
+            {
+                canSeePlayer = false;
+
+                if (viewConeVisualizer != null)
+                {
+                    viewConeVisualizer.SetViewState(
+                        ViewConeVisualizer.ViewState.Warning);
+                }
+            }
+        }
+        else
+        {
+            detectionTimer = 0.0f;
+            canSeePlayer = false;
+
+            if (viewConeVisualizer != null)
+            {
+                viewConeVisualizer.SetViewState(
+                    ViewConeVisualizer.ViewState.Normal);
+            }
+        }
     }
 
     public bool CanSeePlayer()
@@ -27,45 +70,77 @@ public class SecurityCameraVision : MonoBehaviour
     }
 
     private bool CheckCanSeePlayer()
+{
+    if (visionOrigin == null || player == null)
     {
-        if (visionOrigin == null || player == null)
-        {
-            return false;
-        }
+        return false;
+    }
 
-        Vector3 directionToPlayer =
-            player.position - visionOrigin.position;
+    Vector3 directionToPlayer =
+        player.position - visionOrigin.position;
 
-        float distanceToPlayer = directionToPlayer.magnitude;
+    /*
+     * 距離と角度の判定では高さを無視する。
+     * 床に表示している扇形と同じ水平面で判定するため。
+     */
+    Vector3 horizontalDirectionToPlayer =
+        new Vector3(
+            directionToPlayer.x,
+            0.0f,
+            directionToPlayer.z);
 
-        if (distanceToPlayer > detectionDistance)
-        {
-            return false;
-        }
+    float horizontalDistance =
+        horizontalDirectionToPlayer.magnitude;
 
-        Vector3 normalizedDirection =
-            directionToPlayer.normalized;
+    if (horizontalDistance > detectionDistance)
+    {
+        return false;
+    }
 
-        float angleToPlayer = Vector3.Angle(
-            visionOrigin.forward,
-            normalizedDirection);
-
-        if (angleToPlayer > viewAngle * 0.5f)
-        {
-            return false;
-        }
-
-        if (Physics.Raycast(
-            visionOrigin.position,
-            normalizedDirection,
-            distanceToPlayer,
-            obstacleLayer))
-        {
-            return false;
-        }
-
+    if (horizontalDistance <= 0.01f)
+    {
         return true;
     }
+
+    Vector3 horizontalForward =
+        new Vector3(
+            visionOrigin.forward.x,
+            0.0f,
+            visionOrigin.forward.z).normalized;
+
+    Vector3 normalizedHorizontalDirection =
+        horizontalDirectionToPlayer.normalized;
+
+    float angleToPlayer = Vector3.Angle(
+        horizontalForward,
+        normalizedHorizontalDirection);
+
+    if (angleToPlayer > viewAngle * 0.5f)
+    {
+        return false;
+    }
+
+    /*
+     * 障害物判定は実際の高さを使う。
+     * カメラからプレイヤーへ直接Rayを飛ばす。
+     */
+    float actualDistance =
+        directionToPlayer.magnitude;
+
+    Vector3 actualDirection =
+        directionToPlayer.normalized;
+
+    if (Physics.Raycast(
+        visionOrigin.position,
+        actualDirection,
+        actualDistance,
+        obstacleLayer))
+    {
+        return false;
+    }
+
+    return true;
+}
 
     private void OnDrawGizmosSelected()
     {

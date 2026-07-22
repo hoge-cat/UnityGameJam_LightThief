@@ -17,9 +17,9 @@ public class EnemyPatrol : MonoBehaviour
 
     public void StartPatrol()
     {
-        if (patrolPoints == null || patrolPoints.Length == 0)
+        if (!HasValidPatrolPoints())
         {
-            Debug.LogWarning("巡回ポイントが設定されていません。");
+            isPatrolling = false;
             return;
         }
 
@@ -34,7 +34,13 @@ public class EnemyPatrol : MonoBehaviour
             return;
         }
 
-        if (patrolPoints == null || patrolPoints.Length == 0)
+        if (!HasValidPatrolPoints())
+        {
+            isPatrolling = false;
+            return;
+        }
+
+        if (agent == null || !agent.isOnNavMesh)
         {
             return;
         }
@@ -62,8 +68,36 @@ public class EnemyPatrol : MonoBehaviour
         isPatrolling = false;
     }
 
+    private bool HasValidPatrolPoints()
+    {
+        if (patrolPoints == null || patrolPoints.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (Transform patrolPoint in patrolPoints)
+        {
+            if (patrolPoint == null)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void MoveToCurrentPoint()
     {
+        if (!HasValidPatrolPoints())
+        {
+            return;
+        }
+
+        if (agent == null || !agent.isOnNavMesh)
+        {
+            return;
+        }
+
         agent.SetDestination(patrolPoints[currentPointIndex].position);
     }
 }

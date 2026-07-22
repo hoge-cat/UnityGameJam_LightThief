@@ -5,14 +5,10 @@ public class SecurityCameraAlarm : MonoBehaviour
     [Header("参照")]
     [SerializeField] private SecurityCameraVision cameraVision;
 
-    [Header("警報設定")]
-    [SerializeField] private float alarmDelay = 3.0f;
-
     [Header("敵出現設定")]
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private Transform enemySpawnPoint;
 
-    private float detectionTimer;
     private bool isAlarmActive;
     private bool hasSpawnedEnemy;
 
@@ -23,23 +19,29 @@ public class SecurityCameraAlarm : MonoBehaviour
             return;
         }
 
-        if (cameraVision != null && cameraVision.CanSeePlayer())
+        if (cameraVision == null)
         {
-            detectionTimer += Time.deltaTime;
-
-            if (detectionTimer >= alarmDelay)
-            {
-                ActivateAlarm();
-            }
+            return;
         }
-        else
+
+        /*
+         * SecurityCameraVision側で、
+         * 警戒時間を超えて赤色になったときだけ
+         * CanSeePlayer()がtrueになる。
+         */
+        if (cameraVision.CanSeePlayer())
         {
-            detectionTimer = 0.0f;
+            ActivateAlarm();
         }
     }
 
     private void ActivateAlarm()
     {
+        if (isAlarmActive)
+        {
+            return;
+        }
+
         isAlarmActive = true;
 
         Debug.Log("警報発動：敵を出現させます");
@@ -54,9 +56,19 @@ public class SecurityCameraAlarm : MonoBehaviour
             return;
         }
 
-        if (enemyPrefab == null || enemySpawnPoint == null)
+        if (enemyPrefab == null)
         {
-            Debug.LogWarning("Enemy PrefabまたはEnemy Spawn Pointが設定されていません");
+            Debug.LogWarning(
+                "Enemy Prefabが設定されていません");
+
+            return;
+        }
+
+        if (enemySpawnPoint == null)
+        {
+            Debug.LogWarning(
+                "Enemy Spawn Pointが設定されていません");
+
             return;
         }
 

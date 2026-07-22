@@ -6,6 +6,25 @@ public class EnemyVision : MonoBehaviour
     [SerializeField] private float detectionDistance = 5.0f;
     [SerializeField] private float viewAngle = 90.0f;
 
+    private void Start()
+    {
+        if (player == null)
+        {
+            GameObject playerObject =
+                GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+            {
+                player = playerObject.transform;
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "EnemyVision：Playerタグのオブジェクトが見つかりません。");
+            }
+        }
+    }
+
     public bool CanSeePlayer()
     {
         if (!IsPlayerInDetectionDistance())

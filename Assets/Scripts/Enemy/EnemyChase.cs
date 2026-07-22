@@ -12,9 +12,31 @@ public class EnemyChase : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
+    private void Start()
+    {
+        if (player == null)
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+            {
+                player = playerObject.transform;
+            }
+            else
+            {
+                Debug.LogWarning("Playerタグのオブジェクトが見つかりません。");
+            }
+        }
+    }
+
     public void UpdateChase()
     {
         if (player == null)
+        {
+            return;
+        }
+
+        if (agent == null || !agent.isOnNavMesh)
         {
             return;
         }
@@ -24,6 +46,11 @@ public class EnemyChase : MonoBehaviour
 
     public void StopChase()
     {
+        if (agent == null || !agent.isOnNavMesh)
+        {
+            return;
+        }
+
         if (agent.hasPath)
         {
             agent.ResetPath();
