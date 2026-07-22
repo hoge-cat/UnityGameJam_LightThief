@@ -16,39 +16,59 @@ public class PlayerScript : MonoBehaviour
 
     Vector3 startPosition;
     float moveSpeed;
-    float limitDistance;
+    float dashSpeed;
+    Rigidbody rb;
+    float jumpPower;
+    bool isGround = true;
+    //float limitDistance;
     Direction direction = Direction.None;
     //int myStatus;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        direction = Direction.None;
+        //direction = Direction.None;
         InitMan();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log(Keyboard.current);
+
         MoveMan();
     }
 
     void InitMan()
     {
+        rb = GetComponent<Rigidbody>();
+
         moveSpeed = 2.5f;
-        limitDistance = 7.5f;
+        dashSpeed = 5.0f;
+        jumpPower = 5.0f;
+        //limitDistance = 7.5f;
+        startPosition = transform.position;
     }
 
     void MoveMan()
     {
+        //Debug.Log("Move");
+        //Debug.Log(transform.position);
+
+        float speed = moveSpeed;
+
         Vector3 moveDirection = Vector3.zero;
 
-        //transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-
-        if (transform.position.x >= limitDistance)
+        if ((Keyboard.current.kKey.isPressed) ||
+     (Gamepad.current != null && Gamepad.current.buttonWest.isPressed))
         {
-            transform.position = startPosition;
+            speed = dashSpeed;
         }
+
+        //if (transform.position.x >= limitDistance)
+        //{
+        //    transform.position = startPosition;
+        //}
 
         else if (Keyboard.current.wKey.isPressed)
         {
@@ -91,11 +111,10 @@ public class PlayerScript : MonoBehaviour
                 direction = Direction.Right;
             }
 
-            else
+        else
             {
                 return;
             }
-
         }
 
         else
@@ -109,25 +128,50 @@ public class PlayerScript : MonoBehaviour
                 break;
 
             case Direction.Front:
-                transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
                 break;
 
             case Direction.Back:
-                transform.Translate(Vector3.back * moveSpeed * Time.deltaTime);
+                transform.Translate(Vector3.back * speed * Time.deltaTime);
                 break;
 
             case Direction.Left:
-                transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
+                transform.Translate(Vector3.left * speed * Time.deltaTime);
                 break;
 
             case Direction.Right:
-                transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+                transform.Translate(Vector3.right * speed * Time.deltaTime);
                 break;
+        }
+
+
+        if (isGround &&
+            ((Keyboard.current.jKey.wasPressedThisFrame) ||
+             (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)))
+        {
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            isGround = false;
         }
     }
 
     void SetMoveSpeed(float inMoveSpeed)
     {
         moveSpeed *= inMoveSpeed;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGround = true;
+        }
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGround = false;
+        }
     }
 }
