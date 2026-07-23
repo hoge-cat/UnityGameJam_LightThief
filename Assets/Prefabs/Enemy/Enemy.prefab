@@ -563,7 +563,7 @@ MonoBehaviour:
   enemyPatrol: {fileID: 1736134757023008599}
   enemyVision: {fileID: 1789139833452092222}
   enemyChase: {fileID: 2716580087535102636}
-  startWithChase: 1
+  startWithChase: 0
   loseSightTime: 3
 --- !u!114 &1736134757023008599
 MonoBehaviour:

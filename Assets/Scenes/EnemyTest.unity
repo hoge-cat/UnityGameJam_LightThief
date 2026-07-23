@@ -603,7 +603,7 @@ GameObject:
   - component: {fileID: 1594282557}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -780,26 +780,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1736134757023008599, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: 'patrolPoints.Array.data[0]'
-      value: 
-      objectReference: {fileID: 1531280046}
-    - target: {fileID: 1736134757023008599, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: 'patrolPoints.Array.data[1]'
-      value: 
-      objectReference: {fileID: 341672971}
-    - target: {fileID: 1736134757023008599, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: 'patrolPoints.Array.data[2]'
-      value: 
-      objectReference: {fileID: 174476659}
-    - target: {fileID: 1789139833452092222, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 1594282560}
-    - target: {fileID: 2716580087535102636, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 1594282560}
     - target: {fileID: 3043960278770345229, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.37534
