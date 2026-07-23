@@ -1,184 +1,180 @@
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerScript : MonoBehaviour
 {
-    enum Direction
-    {
-        None,
-        Right,
-        Left,
-        Front,
-        Back
-    }
+    [Header("移動設定")]
+    [SerializeField] private float moveSpeed = 2.5f;
+    [SerializeField] private float dashSpeed = 5.0f;
+    [SerializeField] private float jumpPower = 5.0f;
 
-    Vector3 startPosition;
-    float moveSpeed;
-    float dashSpeed;
-    Rigidbody rb;
-    float jumpPower;
-    bool isGround = true;
-    Camera mainCamera;
-    //float limitDistance;
-    Direction direction = Direction.None;
-    //int myStatus;
+    private Rigidbody rb;
+    private Camera mainCamera;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        //direction = Direction.None;
-        InitMan();
-    }
+    private Vector2 moveInput;
+    private bool isDash;
+    private bool isGround = true;
+    private bool jumpRequested;
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Debug.Log(Keyboard.current);
-
-        MoveMan();
-    }
-
-    void InitMan()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
-        moveSpeed = 2.5f;
-        dashSpeed = 5.0f;
-        jumpPower = 5.0f;
-        //limitDistance = 7.5f;
-        startPosition = transform.position;
-
         mainCamera = Camera.main;
+
+        // プレイヤーが物理演算で倒れないようにする
+        rb.constraints =
+            RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationZ;
     }
 
-    void MoveMan()
+    private void Update()
     {
-        //Debug.Log("Move");
-        //Debug.Log(transform.position);
-        //Debug.Log("MoveMan");
+        ReadMoveInput();
+        ReadJumpInput();
+    }
 
-        float speed = moveSpeed;
+    private void FixedUpdate()
+    {
+        MovePlayer();
+        JumpPlayer();
+    }
 
-        direction = Direction.None;
+    private void ReadMoveInput()
+    {
+        moveInput = Vector2.zero;
+        isDash = false;
 
-        Vector3 moveDirection = Vector3.zero;
-
-        if ((Keyboard.current.kKey.isPressed) ||
-     (Gamepad.current != null && Gamepad.current.buttonWest.isPressed))
+        // キーボード
+        if (Keyboard.current != null)
         {
-            speed = dashSpeed;
-        }
-
-        //if (transform.position.x >= limitDistance)
-        //{
-        //    transform.position = startPosition;
-        //}
-
-        else if (Keyboard.current.wKey.isPressed)
-        {
-            direction = Direction.Front;
-        }
-
-        else if (Keyboard.current.sKey.isPressed)
-        {
-            direction = Direction.Back;
-        }
-
-        else if (Keyboard.current.aKey.isPressed)
-        {
-            direction = Direction.Left;
-        }
-
-        else if (Keyboard.current.dKey.isPressed)
-        {
-            direction = Direction.Right;
-        }
-
-        else if (Gamepad.current != null)
-        {
-            Vector2 stick = Gamepad.current.leftStick.ReadValue();
-
-            if (stick.y > 0.5f)
+            if (Keyboard.current.wKey.isPressed)
             {
-                direction = Direction.Front;
-            }
-            else if (stick.y < -0.5f)
-            {
-                direction = Direction.Back;
-            }
-            else if (stick.x < -0.5f)
-            {
-                direction = Direction.Left;
-            }
-            else if (stick.x > 0.5f)
-            {
-                direction = Direction.Right;
+                moveInput.y += 1.0f;
             }
 
-        else
+            if (Keyboard.current.sKey.isPressed)
+            {
+                moveInput.y -= 1.0f;
+            }
+
+            if (Keyboard.current.dKey.isPressed)
+            {
+                moveInput.x += 1.0f;
+            }
+
+            if (Keyboard.current.aKey.isPressed)
+            {
+                moveInput.x -= 1.0f;
+            }
+
+            isDash =
+                Keyboard.current.leftShiftKey.isPressed ||
+                Keyboard.current.rightShiftKey.isPressed;
+        }
+
+        // ゲームパッド
+        if (Gamepad.current != null)
+        {
+            Vector2 stickInput = Gamepad.current.leftStick.ReadValue();
+
+            if (moveInput.sqrMagnitude <= 0.01f)
+            {
+                moveInput = stickInput;
+            }
+
+            if (Gamepad.current.buttonWest.isPressed)
+            {
+                isDash = true;
+            }
+        }
+
+        moveInput = Vector2.ClampMagnitude(moveInput, 1.0f);
+    }
+
+    private void ReadJumpInput()
+    {
+        bool keyboardJump =
+            Keyboard.current != null &&
+            Keyboard.current.spaceKey.wasPressedThisFrame;
+
+        bool gamepadJump =
+            Gamepad.current != null &&
+            Gamepad.current.buttonSouth.wasPressedThisFrame;
+
+        if (isGround && (keyboardJump || gamepadJump))
+        {
+            jumpRequested = true;
+        }
+    }
+
+    private void MovePlayer()
+    {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+
+            if (mainCamera == null)
             {
                 return;
             }
         }
 
-        else
+        Vector3 cameraForward = mainCamera.transform.forward;
+        Vector3 cameraRight = mainCamera.transform.right;
+
+        // カメラの上下方向を無視
+        cameraForward.y = 0.0f;
+        cameraRight.y = 0.0f;
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        Vector3 moveDirection =
+            cameraForward * moveInput.y +
+            cameraRight * moveInput.x;
+
+        float currentSpeed = isDash ? dashSpeed : moveSpeed;
+
+        Vector3 nextPosition =
+            rb.position +
+            moveDirection * currentSpeed * Time.fixedDeltaTime;
+
+        rb.MovePosition(nextPosition);
+
+        // 移動方向へキャラクターを向ける
+        if (moveDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation =
+                Quaternion.LookRotation(moveDirection, Vector3.up);
+
+            Quaternion newRotation = Quaternion.Slerp(
+                rb.rotation,
+                targetRotation,
+                12.0f * Time.fixedDeltaTime
+            );
+
+            rb.MoveRotation(newRotation);
+        }
+    }
+
+    private void JumpPlayer()
+    {
+        if (!jumpRequested)
         {
             return;
         }
 
-        Vector3 move = Vector3.zero;
+        rb.linearVelocity = new Vector3(
+            rb.linearVelocity.x,
+            0.0f,
+            rb.linearVelocity.z
+        );
 
-        Transform cam = mainCamera.transform;
+        rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
 
-        // カメラの前方向・右方向
-        Vector3 forward = cam.forward;
-        Vector3 right = cam.right;
-
-        // 上下方向を無視
-        forward.y = 0;
-        right.y = 0;
-
-        forward.Normalize();
-        right.Normalize();
-
-        switch (direction)
-        {
-            case Direction.Front:
-                move = forward;
-                break;
-
-            case Direction.Back:
-                move = -forward;
-                break;
-
-            case Direction.Left:
-                move = -right;
-                break;
-
-            case Direction.Right:
-                move = right;
-                break;
-        }
-
-        transform.position += move * speed * Time.deltaTime;
-
-
-
-        if (isGround &&
-            ((Keyboard.current.jKey.wasPressedThisFrame) ||
-             (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)))
-        {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
-            isGround = false;
-        }
-    }
-
-    void SetMoveSpeed(float inMoveSpeed)
-    {
-        moveSpeed *= inMoveSpeed;
+        isGround = false;
+        jumpRequested = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -188,6 +184,7 @@ public class PlayerScript : MonoBehaviour
             isGround = true;
         }
     }
+
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
