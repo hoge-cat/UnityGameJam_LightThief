@@ -7,7 +7,8 @@ public class CameraScript : MonoBehaviour
 
     public float distance = 5f;
     public float height = 2f;
-    public float mouseSensitivity = 3f;
+    public float mouseSensitivity = 3.0f;
+    public float cameraRotateSpeed = 120f;
     public float followSpeed = 10f;
 
     float yaw = 0f;
@@ -31,25 +32,32 @@ public class CameraScript : MonoBehaviour
 
     void RotateCamera()
     {
-        float keyX = 0;
-        float keyY = 0;
+        float keyX = 0f;
+        float keyY = 0f;
 
-        if (Input.GetKey(KeyCode.LeftArrow)) keyX = -1;
-        if (Input.GetKey(KeyCode.RightArrow)) keyX = 1;
-        if (Input.GetKey(KeyCode.UpArrow)) keyY = 1;
-        if (Input.GetKey(KeyCode.DownArrow)) keyY = -1;
+        if (Keyboard.current.leftArrowKey.isPressed) keyX = -1;
+        if (Keyboard.current.rightArrowKey.isPressed) keyX = 1;
+        if (Keyboard.current.upArrowKey.isPressed) keyY = 1;
+        if (Keyboard.current.downArrowKey.isPressed) keyY = -1;
 
-        // ゲームパッド右スティック
-        float stickX = Input.GetAxis("RightStickX");
-        float stickY = Input.GetAxis("RightStickY");
+        float stickX = 0f;
+        float stickY = 0f;
 
-        // 全部合成
+        if (Gamepad.current != null)
+        {
+            Vector2 stick = Gamepad.current.rightStick.ReadValue();
+            stickX = stick.x;
+            stickY = stick.y;
+        }
+
         float x = keyX + stickX;
         float y = keyY + stickY;
 
-        yaw += x * mouseSensitivity;
-        pitch -= y * mouseSensitivity;
+        // カメラ回転
+        yaw += x * cameraRotateSpeed * Time.deltaTime;
+        pitch -= y * cameraRotateSpeed * Time.deltaTime;
 
+        // 上下の回転制限
         pitch = Mathf.Clamp(pitch, -30f, 70f);
     }
 

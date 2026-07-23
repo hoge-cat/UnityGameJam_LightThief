@@ -20,6 +20,7 @@ public class PlayerScript : MonoBehaviour
     Rigidbody rb;
     float jumpPower;
     bool isGround = true;
+    Camera mainCamera;
     //float limitDistance;
     Direction direction = Direction.None;
     //int myStatus;
@@ -48,14 +49,19 @@ public class PlayerScript : MonoBehaviour
         jumpPower = 5.0f;
         //limitDistance = 7.5f;
         startPosition = transform.position;
+
+        mainCamera = Camera.main;
     }
 
     void MoveMan()
     {
         //Debug.Log("Move");
         //Debug.Log(transform.position);
+        //Debug.Log("MoveMan");
 
         float speed = moveSpeed;
+
+        direction = Direction.None;
 
         Vector3 moveDirection = Vector3.zero;
 
@@ -122,27 +128,42 @@ public class PlayerScript : MonoBehaviour
             return;
         }
 
+        Vector3 move = Vector3.zero;
+
+        Transform cam = mainCamera.transform;
+
+        // カメラの前方向・右方向
+        Vector3 forward = cam.forward;
+        Vector3 right = cam.right;
+
+        // 上下方向を無視
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
         switch (direction)
         {
-            case Direction.None:
-                break;
-
             case Direction.Front:
-                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+                move = forward;
                 break;
 
             case Direction.Back:
-                transform.Translate(Vector3.back * speed * Time.deltaTime);
+                move = -forward;
                 break;
 
             case Direction.Left:
-                transform.Translate(Vector3.left * speed * Time.deltaTime);
+                move = -right;
                 break;
 
             case Direction.Right:
-                transform.Translate(Vector3.right * speed * Time.deltaTime);
+                move = right;
                 break;
         }
+
+        transform.position += move * speed * Time.deltaTime;
+
 
 
         if (isGround &&
