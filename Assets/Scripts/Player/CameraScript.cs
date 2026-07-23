@@ -22,6 +22,13 @@ public class CameraScript : MonoBehaviour
 
     void Update()
     {
+        if (Keyboard.current != null &&
+            Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
         RotateCamera();
     }
 
@@ -32,32 +39,59 @@ public class CameraScript : MonoBehaviour
 
     void RotateCamera()
     {
-        float keyX = 0f;
-        float keyY = 0f;
+        Vector2 input = Vector2.zero;
 
-        if (Keyboard.current.leftArrowKey.isPressed) keyX = -1;
-        if (Keyboard.current.rightArrowKey.isPressed) keyX = 1;
-        if (Keyboard.current.upArrowKey.isPressed) keyY = 1;
-        if (Keyboard.current.downArrowKey.isPressed) keyY = -1;
+        // 矢印キー
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.leftArrowKey.isPressed)
+            {
+                input.x -= 1f;
+            }
 
-        float stickX = 0f;
-        float stickY = 0f;
+            if (Keyboard.current.rightArrowKey.isPressed)
+            {
+                input.x += 1f;
+            }
 
+            if (Keyboard.current.upArrowKey.isPressed)
+            {
+                input.y += 1f;
+            }
+
+            if (Keyboard.current.downArrowKey.isPressed)
+            {
+                input.y -= 1f;
+            }
+        }
+
+        // コントローラー右スティック
         if (Gamepad.current != null)
         {
             Vector2 stick = Gamepad.current.rightStick.ReadValue();
-            stickX = stick.x;
-            stickY = stick.y;
+
+            if (stick.magnitude >= 0.15f)
+            {
+                input += stick;
+            }
         }
 
-        float x = keyX + stickX;
-        float y = keyY + stickY;
+        // マウス
+        Vector2 mouseInput = Vector2.zero;
 
-        // カメラ回転
-        yaw += x * cameraRotateSpeed * Time.deltaTime;
-        pitch -= y * cameraRotateSpeed * Time.deltaTime;
+        if (Mouse.current != null)
+        {
+            mouseInput = Mouse.current.delta.ReadValue();
+        }
 
-        // 上下の回転制限
+        // 矢印キー・右スティック
+        yaw += input.x * cameraRotateSpeed * Time.deltaTime;
+        pitch -= input.y * cameraRotateSpeed * Time.deltaTime;
+
+        // マウス
+        yaw += mouseInput.x * mouseSensitivity * 0.02f;
+        pitch -= mouseInput.y * mouseSensitivity * 0.02f;
+
         pitch = Mathf.Clamp(pitch, -30f, 70f);
     }
 
