@@ -23,6 +23,7 @@ public class ViewConeVisualizer : MonoBehaviour
     [SerializeField] private Material viewMaterial;
 
     [SerializeField] private float heightOffset = 0.03f;
+    [SerializeField] private float groundY = 0.03f;
 
     [SerializeField, Range(3, 100)]
     private int segmentCount = 30;
@@ -57,13 +58,28 @@ public class ViewConeVisualizer : MonoBehaviour
             return;
         }
 
-        viewObject.transform.position =
-            transform.position + Vector3.up * heightOffset;
+        Vector3 viewPosition;
+
+        if (visionOrigin != null)
+        {
+            // X・Zは実際の視界判定の開始位置に合わせる
+            viewPosition = visionOrigin.position;
+        }
+        else
+        {
+            viewPosition = transform.position;
+        }
+
+        // Yだけ地面の高さに固定する
+        viewPosition.y = groundY + heightOffset;
+
+        viewObject.transform.position = viewPosition;
 
         float yRotation = transform.eulerAngles.y;
 
         if (visionOrigin != null)
         {
+            // 向きも実際の判定と合わせる
             yRotation = visionOrigin.eulerAngles.y;
         }
 
