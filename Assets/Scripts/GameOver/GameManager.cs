@@ -21,7 +21,8 @@ public class gameR : MonoBehaviour
 
     public void GameOver()
     {
-        gameStatus = GameStatus.GameOver;
+        if (gameStatus == GameStatus.GameOver)
+        //gameStatus = GameStatus.GameOver;
     }
 
     // Update is called once per frame
