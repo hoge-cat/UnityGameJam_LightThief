@@ -21,6 +21,12 @@ public class EnemyController : MonoBehaviour
     private EnemyState currentState;
     private float loseSightTimer;
 
+    // 監視カメラから生成された敵か
+    private bool isCameraSpawnedEnemy;
+
+    // この敵を生成した監視カメラ
+    private SecurityCameraAlarm sourceCameraAlarm;
+
     private void Start()
     {
         if (startWithChase)
@@ -69,10 +75,48 @@ public class EnemyController : MonoBehaviour
 
         loseSightTimer += Time.deltaTime;
 
-        if (loseSightTimer >= loseSightTime)
+        if (loseSightTimer < loseSightTime)
         {
-            ChangeState(EnemyState.Patrol);
+            return;
         }
+
+        // 監視カメラから生成された敵なら、巡回せず消滅
+        if (isCameraSpawnedEnemy)
+        {
+            FinishCameraChase();
+            return;
+        }
+
+        ChangeState(EnemyState.Patrol);
+    }
+
+    public void StartChasing()
+    {
+        startWithChase = true;
+        ChangeState(EnemyState.Chase);
+    }
+
+    // 監視カメラから生成された敵として初期化
+    public void InitializeAsCameraSpawned(
+        SecurityCameraAlarm cameraAlarm)
+    {
+        isCameraSpawnedEnemy = true;
+        sourceCameraAlarm = cameraAlarm;
+        startWithChase = true;
+
+        ChangeState(EnemyState.Chase);
+    }
+
+    private void FinishCameraChase()
+    {
+        enemyChase.StopChase();
+
+        if (sourceCameraAlarm != null)
+        {
+            sourceCameraAlarm.OnSpawnedEnemyFinished();
+        }
+
+        Destroy(gameObject);
     }
 
     private void ChangeState(EnemyState newState)
