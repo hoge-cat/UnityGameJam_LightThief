@@ -71,8 +71,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SecurityCameraAlarm
   cameraVision: {fileID: 5660960321731892483}
+  player: {fileID: 0}
   enemyPrefab: {fileID: 3668072237167214820, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-  enemySpawnPoint: {fileID: 8549823043922994686}
+  spawnDistance: 5
+  navMeshSearchDistance: 2
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  lineCheckHeight: 1
 --- !u!114 &1109741154045745745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,7 +161,7 @@ Transform:
   m_GameObject: {fileID: 4430692738602737601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0.6}
+  m_LocalPosition: {x: 0.00000011920929, y: 2, z: -0.4000001}
   m_LocalScale: {x: 0.7, y: 0.45, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:

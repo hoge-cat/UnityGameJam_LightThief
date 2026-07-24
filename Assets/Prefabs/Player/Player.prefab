@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerScript
   moveSpeed: 2.5
-  dashSpeed: 5
+  dashSpeed: 4
   jumpPower: 5
 --- !u!114 &7434661939623615670
 MonoBehaviour:
