@@ -52,12 +52,12 @@ MonoBehaviour:
   visionOrigin: {fileID: 228670051224796043}
   player: {fileID: 0}
   viewConeVisualizer: {fileID: 1109741154045745745}
-  detectionDistance: 8
-  viewAngle: 60
+  detectionDistance: 12
+  viewAngle: 90
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
-  alertTime: 1
+  alertTime: 0.5
 --- !u!114 &7162374537893558699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,10 +86,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ViewConeVisualizer
   visionOrigin: {fileID: 228670051224796043}
-  viewDistance: 8
-  viewAngle: 60
+  viewDistance: 12
+  viewAngle: 90
   viewMaterial: {fileID: 2100000, guid: a50b15af0cdec624794be7de5c5eccdd, type: 2}
   heightOffset: 0.03
+  groundY: 0.1
   segmentCount: 30
   normalColor: {r: 1, g: 1, b: 0, a: 0.3}
   warningColor: {r: 1, g: 0.5, b: 0, a: 0.3}
