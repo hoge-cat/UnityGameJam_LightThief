@@ -147,8 +147,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1329330009}
   - {fileID: 1786675964}
+  - {fileID: 1329330009}
   m_Father: {fileID: 669195726}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -902,11 +902,11 @@ RectTransform:
   - {fileID: 504360339}
   m_Father: {fileID: 62700406}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -300, y: -165}
   m_SizeDelta: {x: 160, y: 20}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &1329330010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -954,7 +954,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1119,7 +1119,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -395.5, y: -191.74997}
-  m_SizeDelta: {x: 115, y: 50}
+  m_SizeDelta: {x: 170, y: 100}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1786675965
 MonoBehaviour:
@@ -1141,7 +1141,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Battery
+  m_text: 'BATTERY
 
 '
   m_isRightToLeft: 0
@@ -1271,6 +1271,8 @@ MonoBehaviour:
   currentBattery: 100
   drainSpeed: 1
   flashlightOn: 1
+  batterySlider: {fileID: 1329330010}
+  batteryText: {fileID: 1786675965}
 --- !u!1 &2055916487
 GameObject:
   m_ObjectHideFlags: 0
