@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class GameOverPlayer : MonoBehaviour
 {
     public gameR gameManager;
 

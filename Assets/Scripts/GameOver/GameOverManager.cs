@@ -22,7 +22,10 @@ public class gameR : MonoBehaviour
     public void GameOver()
     {
         if (gameStatus == GameStatus.GameOver)
-        //gameStatus = GameStatus.GameOver;
+            return;
+
+        gameStatus = GameStatus.GameOver;
+        Debug.Log("ゲームオーバー");
     }
 
     // Update is called once per frame
@@ -45,9 +48,9 @@ public class gameR : MonoBehaviour
             case GameStatus.GameClear:
                 break;
 
-            case GameStatus.GameOver:
-                Debug.Log("ゲームオーバー");
-                break;
+            //case GameStatus.GameOver:
+            //    Debug.Log("ゲームオーバー");
+            //    break;
 
             default:
                 break;
