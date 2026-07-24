@@ -29,19 +29,19 @@ public class BatteryManager : MonoBehaviour
 
         batterySlider.value = currentBattery / maxBattery;
 
-        batteryText.text = "BATTERY\n" + Mathf.CeilToInt(currentBattery);
+        batteryText.text = "BATTERY\n" + Mathf.CeilToInt(currentBattery) + "%";
 
         // Tキーで30減らす（テスト）
-        if (Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            DrainBattery(30f);
-        }
+        //if (Keyboard.current.tKey.wasPressedThisFrame)
+        //{
+        //    DrainBattery(30f);
+        //}
 
         //// Rキーで30回復（テスト）
-        if (Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            AddBattery(30f);
-        }
+        //if (Keyboard.current.rKey.wasPressedThisFrame)
+        //{
+        //    AddBattery(30f);
+        //}
     }
 
     // バッテリーを減らす
