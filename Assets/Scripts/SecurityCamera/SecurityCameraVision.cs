@@ -22,6 +22,25 @@ public class SecurityCameraVision : MonoBehaviour
 
     private bool canSeePlayer;
 
+    private void Start()
+    {
+        if (player == null)
+        {
+            GameObject playerObject =
+                GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+            {
+                player = playerObject.transform;
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "SecurityCameraVision：Playerタグのオブジェクトが見つかりません。");
+            }
+        }
+    }
+
     private void Update()
     {
         bool isPlayerVisible = CheckCanSeePlayer();

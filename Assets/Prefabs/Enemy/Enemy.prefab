@@ -563,7 +563,7 @@ MonoBehaviour:
   enemyPatrol: {fileID: 1736134757023008599}
   enemyVision: {fileID: 1789139833452092222}
   enemyChase: {fileID: 2716580087535102636}
-  startWithChase: 1
+  startWithChase: 0
   loseSightTime: 3
 --- !u!114 &1736134757023008599
 MonoBehaviour:
@@ -577,7 +577,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f09b4eb9963e2748a27bfb44985c3fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPatrol
-  patrolPoints: []
+  patrolPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   arrivalDistance: 0.5
 --- !u!114 &1789139833452092222
 MonoBehaviour:
@@ -592,8 +596,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyVision
   player: {fileID: 0}
-  detectionDistance: 5
-  viewAngle: 90
+  detectionDistance: 20
+  viewAngle: 70
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &2716580087535102636
 MonoBehaviour:
   m_ObjectHideFlags: 0
