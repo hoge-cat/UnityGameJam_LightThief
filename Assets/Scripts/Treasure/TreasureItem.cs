@@ -1,22 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DoorController : MonoBehaviour
+public class TreasureItem : MonoBehaviour
 {
-    [Header("開閉設定")]
-    [SerializeField] private float openAngle = 90.0f;
-    [SerializeField] private float openSpeed = 2.0f;
-
-    [Header("操作設定")]
     [SerializeField] private float interactionDistance = 2.0f;
 
     private Transform player;
-
-    private bool isOpen;
     private bool wasPlayerInRange;
-
-    private Quaternion closedRotation;
-    private Quaternion openedRotation;
+    private bool hasCollected;
 
     private void Start()
     {
@@ -30,25 +21,13 @@ public class DoorController : MonoBehaviour
         else
         {
             Debug.LogWarning(
-                "DoorController：Playerタグのオブジェクトが見つかりません。");
+                "TreasureItem：Playerタグのオブジェクトが見つかりません。");
         }
-
-        closedRotation = transform.localRotation;
-
-        openedRotation =
-            closedRotation *
-            Quaternion.Euler(0.0f, openAngle, 0.0f);
     }
 
     private void Update()
     {
-        UpdateInteraction();
-        UpdateDoorRotation();
-    }
-
-    private void UpdateInteraction()
-    {
-        if (player == null)
+        if (hasCollected || player == null)
         {
             return;
         }
@@ -61,16 +40,14 @@ public class DoorController : MonoBehaviour
         bool isPlayerInRange =
             distanceToPlayer <= interactionDistance;
 
-        // ドアの範囲に入った瞬間
         if (isPlayerInRange && !wasPlayerInRange)
         {
-            TutorialUIManager.Instance?.ShowDoorPrompt(isOpen);
+            TutorialUIManager.Instance?.ShowTreasurePrompt();
         }
 
-        // ドアの範囲から出た瞬間
         if (!isPlayerInRange && wasPlayerInRange)
         {
-            TutorialUIManager.Instance?.HideDoorPrompt();
+            TutorialUIManager.Instance?.HideTreasurePrompt();
         }
 
         wasPlayerInRange = isPlayerInRange;
@@ -90,29 +67,35 @@ public class DoorController : MonoBehaviour
 
         if (keyboardPressed || gamepadPressed)
         {
-            isOpen = !isOpen;
-
-            TutorialUIManager.Instance?.SetDoorPrompt(isOpen);
+            Collect();
         }
     }
 
-    private void UpdateDoorRotation()
+    private void Collect()
     {
-        Quaternion targetRotation =
-            isOpen ? openedRotation : closedRotation;
+        if (hasCollected)
+        {
+            return;
+        }
 
-        transform.localRotation =
-            Quaternion.Slerp(
-                transform.localRotation,
-                targetRotation,
-                openSpeed * Time.deltaTime);
+        hasCollected = true;
+
+        if (wasPlayerInRange)
+        {
+            TutorialUIManager.Instance?.HideTreasurePrompt();
+            wasPlayerInRange = false;
+        }
+
+        TreasureManager.Instance?.CollectTreasure();
+
+        Destroy(gameObject);
     }
 
     private void OnDisable()
     {
         if (wasPlayerInRange)
         {
-            TutorialUIManager.Instance?.HideDoorPrompt();
+            TutorialUIManager.Instance?.HideTreasurePrompt();
             wasPlayerInRange = false;
         }
     }
