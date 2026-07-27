@@ -17,6 +17,9 @@ public class EnemyController : MonoBehaviour
     [Header("攻撃設定")]
     [SerializeField] private float attackDistance = 1.5f;
     [SerializeField] private float attackInterval = 1.0f;
+    [SerializeField] private float attackBatteryDamage = 20.0f;
+
+    [SerializeField] private BatteryManager batteryManager;
 
     private float attackTimer;
 
@@ -125,6 +128,12 @@ public class EnemyController : MonoBehaviour
                     enemyAnimator.PlayAttack();
                 }
 
+                if (batteryManager != null)
+                {
+                    batteryManager.DrainBattery(
+                        attackBatteryDamage);
+                }
+
                 Debug.Log("Enemyが攻撃しました");
             }
 
@@ -212,5 +221,11 @@ public class EnemyController : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+
+        if (batteryManager == null)
+        {
+            batteryManager =
+                FindFirstObjectByType<BatteryManager>();
+        }
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class BatteryManager : MonoBehaviour
 {
@@ -33,6 +34,9 @@ public class BatteryManager : MonoBehaviour
         if (IsEmpty())
         {
             flashlightOn = false;
+
+            SceneManager.LoadScene("Result");
+            return;
         }
 
         UpdateUI();
