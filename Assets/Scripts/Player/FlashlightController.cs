@@ -6,8 +6,10 @@ public class FlashlightController : MonoBehaviour
     [Header("ライト設定")]
     [SerializeField] private Light flashlight;
 
+    [SerializeField] private BatteryManager batteryManager;
+
     [Header("操作設定")]
-    [SerializeField] private bool startWithLightOn = true;
+    [SerializeField] private bool startWithLightOn = false;
 
     private bool isLightOn;
 
@@ -20,10 +22,25 @@ public class FlashlightController : MonoBehaviour
 
         isLightOn = startWithLightOn;
         ApplyLightState();
+
+        if (batteryManager != null)
+        {
+            batteryManager.SetFlashlightState(isLightOn);
+        }
     }
 
     private void Update()
     {
+        // バッテリー切れなら自動でライトを消す
+        if (isLightOn &&
+            batteryManager != null &&
+            batteryManager.IsEmpty())
+        {
+            isLightOn = false;
+            ApplyLightState();
+            batteryManager.SetFlashlightState(false);
+        }
+
         bool keyboardPressed =
             Keyboard.current != null &&
             Keyboard.current.fKey.wasPressedThisFrame;
@@ -40,8 +57,22 @@ public class FlashlightController : MonoBehaviour
 
     public void ToggleFlashlight()
     {
+        // ライトOFF→ONにするとき、バッテリーが無ければ点灯しない
+        if (!isLightOn &&
+            batteryManager != null &&
+            !batteryManager.CanUseFlashlight())
+        {
+            return;
+        }
+
         isLightOn = !isLightOn;
+
         ApplyLightState();
+
+        if (batteryManager != null)
+        {
+            batteryManager.SetFlashlightState(isLightOn);
+        }
     }
 
     private void ApplyLightState()
