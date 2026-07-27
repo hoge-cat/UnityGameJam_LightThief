@@ -7,6 +7,9 @@ public class TreasureManager : MonoBehaviour
 
     [SerializeField] private TMP_Text treasureText;
 
+    [Header("ゴール設定")]
+    [SerializeField] private GameObject goalObject;
+
     private int collectedTreasure;
     private int totalTreasure;
 
@@ -24,13 +27,24 @@ public class TreasureManager : MonoBehaviour
 
         totalTreasure = treasures.Length;
 
+        if (goalObject != null)
+        {
+            goalObject.SetActive(false);
+        }
+
         UpdateTreasureUI();
     }
 
     public void CollectTreasure()
     {
         collectedTreasure++;
+
         UpdateTreasureUI();
+
+        if (HasCollectedAllTreasure())
+        {
+            ActivateGoal();
+        }
     }
 
     public int GetCollectedTreasure()
@@ -45,7 +59,8 @@ public class TreasureManager : MonoBehaviour
 
     public bool HasCollectedAllTreasure()
     {
-        return collectedTreasure >= totalTreasure;
+        return totalTreasure > 0 &&
+               collectedTreasure >= totalTreasure;
     }
 
     private void UpdateTreasureUI()
@@ -60,6 +75,16 @@ public class TreasureManager : MonoBehaviour
             collectedTreasure +
             " / " +
             totalTreasure;
+    }
+
+    private void ActivateGoal()
+    {
+        if (goalObject != null)
+        {
+            goalObject.SetActive(true);
+        }
+
+        Debug.Log("すべての宝を集めました。出口が有効になりました。");
     }
 
     private void OnDestroy()
