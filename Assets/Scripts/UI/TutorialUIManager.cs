@@ -10,6 +10,7 @@ public class TutorialUIManager : MonoBehaviour
 
     private bool hasUsedFlashlight;
     private int nearbyDoorCount;
+    private int nearbyTreasureCount;
 
     private void Awake()
     {
@@ -77,15 +78,19 @@ public class TutorialUIManager : MonoBehaviour
             return;
         }
 
-        // ドアの近くではドア操作を優先
-        if (nearbyDoorCount > 0)
+        if (nearbyTreasureCount > 0)
         {
-            tutorialText.text = "Eキー: 開ける";
+            tutorialText.text = "Eキー: 取得";
             tutorialText.gameObject.SetActive(true);
             return;
         }
 
-        // 初めてライトを点灯するまでは表示
+        if (nearbyDoorCount > 0)
+        {
+            tutorialText.gameObject.SetActive(true);
+            return;
+        }
+
         if (!hasUsedFlashlight)
         {
             tutorialText.text = "Fキー: ライト点灯";
@@ -102,5 +107,19 @@ public class TutorialUIManager : MonoBehaviour
         {
             Instance = null;
         }
+    }
+
+    public void ShowTreasurePrompt()
+    {
+        nearbyTreasureCount++;
+        RefreshText();
+    }
+
+    public void HideTreasurePrompt()
+    {
+        nearbyTreasureCount =
+            Mathf.Max(0, nearbyTreasureCount - 1);
+
+        RefreshText();
     }
 }
