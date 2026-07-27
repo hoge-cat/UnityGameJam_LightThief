@@ -17,6 +17,8 @@ public class PlayerScript : MonoBehaviour
     private bool isGround = true;
     private bool jumpRequested;
 
+    private PlayerSounds playerSounds;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -26,6 +28,8 @@ public class PlayerScript : MonoBehaviour
         rb.constraints =
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationZ;
+
+        playerSounds = GetComponent<PlayerSounds>();
     }
 
     private void Update()
@@ -134,6 +138,25 @@ public class PlayerScript : MonoBehaviour
             cameraForward * moveInput.y +
             cameraRight * moveInput.x;
 
+        if (moveDirection.sqrMagnitude > 0.001f)
+        {
+            if (isDash)
+            {
+                playerSounds.StopFootstep();
+                playerSounds.PlayDash();
+            }
+            else
+            {
+                playerSounds.StopDash();
+                playerSounds.PlayFootstep();
+            }
+        }
+        else
+        {
+            playerSounds.StopFootstep();
+            playerSounds.StopDash();
+        }
+
         float currentSpeed = isDash ? dashSpeed : moveSpeed;
 
         Vector3 nextPosition =
@@ -173,6 +196,9 @@ public class PlayerScript : MonoBehaviour
 
         rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
 
+        //ジャンプ音
+        playerSounds.PlayJump();
+
         isGround = false;
         jumpRequested = false;
     }
@@ -190,6 +216,8 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGround = false;
+
+            playerSounds.PlayLanding();
         }
     }
 }
