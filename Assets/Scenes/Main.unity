@@ -823,10 +823,6 @@ PrefabInstance:
       propertyPath: 'patrolPoints.Array.data[2]'
       value: 
       objectReference: {fileID: 845750335}
-    - target: {fileID: 1736134757023008599, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
-      propertyPath: 'patrolPoints.Array.data[3]'
-      value: 
-      objectReference: {fileID: 1418227409}
     - target: {fileID: 1764947114421787173, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
       propertyPath: batteryManager
       value: 

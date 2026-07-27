@@ -21,7 +21,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private BatteryManager batteryManager;
 
-    private float attackTimer;
+    private float attackCooldownTimer;
 
     [Header("開始状態")]
     [SerializeField] private bool startWithChase;
@@ -84,8 +84,13 @@ public class EnemyController : MonoBehaviour
 
     private void UpdateChaseState()
     {
-        bool canSeePlayer =
-            enemyVision.CanSeePlayer();
+        // 攻撃の待ち時間は、プレイヤーが動いていても減らし続ける
+        if (attackCooldownTimer > 0.0f)
+        {
+            attackCooldownTimer -= Time.deltaTime;
+        }
+
+        bool canSeePlayer = enemyVision.CanSeePlayer();
 
         if (canSeePlayer)
         {
@@ -111,36 +116,23 @@ public class EnemyController : MonoBehaviour
         float distanceToPlayer =
             enemyVision.GetDistanceToPlayer();
 
-        // プレイヤーが見えていて、攻撃距離内の場合だけ攻撃
+        // 見えていて、攻撃範囲内なら移動中でも攻撃
         if (canSeePlayer &&
             distanceToPlayer <= attackDistance)
         {
             enemyChase.StopChase();
 
-            attackTimer += Time.deltaTime;
-
-            if (attackTimer >= attackInterval)
+            if (attackCooldownTimer <= 0.0f)
             {
-                attackTimer = 0.0f;
+                AttackPlayer();
 
-                if (enemyAnimator != null)
-                {
-                    enemyAnimator.PlayAttack();
-                }
-
-                if (batteryManager != null)
-                {
-                    batteryManager.DrainBattery(
-                        attackBatteryDamage);
-                }
-
-                Debug.Log("Enemyが攻撃しました");
+                attackCooldownTimer = attackInterval;
             }
 
             return;
         }
 
-        attackTimer = 0.0f;
+        // ここでタイマーを0に戻さない
         enemyChase.UpdateChase();
     }
 
@@ -213,6 +205,9 @@ public class EnemyController : MonoBehaviour
                     agent.speed = chaseSpeed;
                 }
 
+                // 最初の攻撃をすぐ出せる状態にする
+                attackCooldownTimer = 0.0f;
+
                 enemyPatrol.StopPatrol();
                 break;
         }
@@ -227,5 +222,22 @@ public class EnemyController : MonoBehaviour
             batteryManager =
                 FindFirstObjectByType<BatteryManager>();
         }
+    }
+
+    private void AttackPlayer()
+    {
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.PlayAttack();
+        }
+
+        if (batteryManager != null)
+        {
+            batteryManager.DrainBattery(
+                attackBatteryDamage
+            );
+        }
+
+        Debug.Log("Enemyが攻撃しました");
     }
 }
