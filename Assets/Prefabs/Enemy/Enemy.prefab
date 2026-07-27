@@ -429,8 +429,10 @@ MonoBehaviour:
   enemyVision: {fileID: 1789139833452092222}
   enemyChase: {fileID: 2716580087535102636}
   enemyAnimator: {fileID: 2836834881008818551}
-  attackDistance: 1.5
+  attackDistance: 2
   attackInterval: 1
+  attackBatteryDamage: 20
+  batteryManager: {fileID: 0}
   startWithChase: 0
   loseSightTime: 3
   patrolSpeed: 1.5
