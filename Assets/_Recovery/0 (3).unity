@@ -2425,6 +2425,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95f9fd7b6f409ff49bacc8bbb68f4fb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSounds
+  footstepSource: {fileID: 2119637903}
+  dashSource: {fileID: 2119637908}
+  seSource: {fileID: 2119637909}
+  dashInterval: 0.3
+  footstepSE: {fileID: 8300000, guid: f352d0c8373b8014d87e95eed0837baf, type: 3}
+  jumpSE: {fileID: 8300000, guid: 8b0ef0fc1b943a94dbe40dffc1725d03, type: 3}
+  landingSE: {fileID: 8300000, guid: 613e16aec25f76543b11f391633cabea, type: 3}
+  dashSE: {fileID: 8300000, guid: 954f67ea42d3d6e4ca425b1f9f955a3a, type: 3}
 --- !u!82 &2119637903
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2725,17 +2733,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2119637901}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cea80593a90aa0641af1dc9568eb38cc, type: 3}
+  m_Script: {fileID: 11500000, guid: 95f9fd7b6f409ff49bacc8bbb68f4fb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSounds
-  footstepSource: {fileID: 2119637903}
-  dashSource: {fileID: 2119637908}
-  seSource: {fileID: 2119637909}
+  footstepSource: {fileID: 0}
+  dashSource: {fileID: 0}
+  seSource: {fileID: 0}
   dashInterval: 0.25
-  footstepSE: {fileID: 8300000, guid: f352d0c8373b8014d87e95eed0837baf, type: 3}
-  jumpSE: {fileID: 8300000, guid: 8b0ef0fc1b943a94dbe40dffc1725d03, type: 3}
-  landingSE: {fileID: 8300000, guid: 613e16aec25f76543b11f391633cabea, type: 3}
-  dashSE: {fileID: 8300000, guid: 954f67ea42d3d6e4ca425b1f9f955a3a, type: 3}
+  footstepSE: {fileID: 0}
+  jumpSE: {fileID: 0}
+  landingSE: {fileID: 0}
+  dashSE: {fileID: 0}
 --- !u!1001 &2126184618
 PrefabInstance:
   m_ObjectHideFlags: 0

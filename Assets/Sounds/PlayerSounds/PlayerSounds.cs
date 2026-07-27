@@ -4,7 +4,10 @@ public class PlayerSounds : MonoBehaviour
 {
     [Header("Audio Source")]
     public AudioSource footstepSource; // 足音用
-    public AudioSource seSource;       // ジャンプ・着地・ダッシュ用
+    public AudioSource dashSource;       // ジャンプ・着地・ダッシュ用
+    public AudioSource seSource;       // ジャンプ・着地
+    private float dashTimer = 0f;
+    [SerializeField] private float dashInterval = 0.25f;
 
     [Header("Sound Effects")]
     public AudioClip footstepSE;
@@ -16,15 +19,16 @@ public class PlayerSounds : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (footstepSource == null)
-        {
-            footstepSource = GetComponents<AudioSource>()[0];
-        }
+        AudioSource[] sources = GetComponents<AudioSource>();
 
-        if (seSource == null)
-        {
-            seSource = GetComponents<AudioSource>()[1];
-        }
+        if (footstepSource == null && sources.Length > 0)
+            footstepSource = sources[0];
+
+        if (dashSource == null && sources.Length > 1)
+            dashSource = sources[1];
+
+        if (seSource == null && sources.Length > 2)
+            seSource = sources[2];
     }
 
     // Update is called once per frame
@@ -36,11 +40,10 @@ public class PlayerSounds : MonoBehaviour
     // 足音
     public void PlayFootstep()
     {
-        footstepSource.clip = footstepSE;
-        footstepSource.loop = true;
-
         if (!footstepSource.isPlaying)
         {
+            footstepSource.clip = footstepSE;
+            footstepSource.loop = false;
             footstepSource.Play();
         }
     }
@@ -65,15 +68,17 @@ public class PlayerSounds : MonoBehaviour
     // ダッシュ
     public void PlayDash()
     {
-        if (!isDashPlaying)
+        dashTimer -= Time.deltaTime;
+
+        if (dashTimer <= 0f)
         {
-            seSource.PlayOneShot(dashSE);
-            isDashPlaying = true;
+            dashTimer = dashInterval;
+            dashSource.PlayOneShot(dashSE);
         }
     }
 
     public void StopDash()
     {
-        isDashPlaying = false;
+        dashTimer = 0f;
     }
 }

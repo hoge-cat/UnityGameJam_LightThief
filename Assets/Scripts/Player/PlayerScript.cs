@@ -16,6 +16,7 @@ public class PlayerScript : MonoBehaviour
     private bool isDash;
     private bool isGround = true;
     private bool jumpRequested;
+    private bool hasJumped = false;
 
     private PlayerSounds playerSounds;
 
@@ -94,6 +95,11 @@ public class PlayerScript : MonoBehaviour
         }
 
         moveInput = Vector2.ClampMagnitude(moveInput, 1.0f);
+
+        if (moveInput.magnitude < 0.15f)
+        {
+            moveInput = Vector2.zero;
+        }
     }
 
     private void ReadJumpInput()
@@ -140,7 +146,7 @@ public class PlayerScript : MonoBehaviour
 
         if (moveDirection.sqrMagnitude > 0.001f)
         {
-            if (isDash)
+            if (isDash && isGround && moveDirection.sqrMagnitude > 0.001f)
             {
                 playerSounds.StopFootstep();
                 playerSounds.PlayDash();
@@ -148,36 +154,44 @@ public class PlayerScript : MonoBehaviour
             else
             {
                 playerSounds.StopDash();
-                playerSounds.PlayFootstep();
+
+                if (isGround && moveDirection.magnitude > 0.1f)
+                {
+                    playerSounds.PlayFootstep();
+                }
+                else
+                {
+                    playerSounds.StopFootstep();
+                }
+            }
+
+            float currentSpeed = isDash ? dashSpeed : moveSpeed;
+
+            Vector3 nextPosition =
+                rb.position +
+                moveDirection * currentSpeed * Time.fixedDeltaTime;
+
+            rb.MovePosition(nextPosition);
+
+            // 移動方向へキャラクターを向ける
+            if (moveDirection.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation =
+                    Quaternion.LookRotation(moveDirection, Vector3.up);
+
+                Quaternion newRotation = Quaternion.Slerp(
+                    rb.rotation,
+                    targetRotation,
+                    12.0f * Time.fixedDeltaTime
+                );
+
+                rb.MoveRotation(newRotation);
             }
         }
-        else
+
+        if (moveDirection.sqrMagnitude <= 0.001f)
         {
             playerSounds.StopFootstep();
-            playerSounds.StopDash();
-        }
-
-        float currentSpeed = isDash ? dashSpeed : moveSpeed;
-
-        Vector3 nextPosition =
-            rb.position +
-            moveDirection * currentSpeed * Time.fixedDeltaTime;
-
-        rb.MovePosition(nextPosition);
-
-        // 移動方向へキャラクターを向ける
-        if (moveDirection.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(moveDirection, Vector3.up);
-
-            Quaternion newRotation = Quaternion.Slerp(
-                rb.rotation,
-                targetRotation,
-                12.0f * Time.fixedDeltaTime
-            );
-
-            rb.MoveRotation(newRotation);
         }
     }
 
@@ -196,8 +210,13 @@ public class PlayerScript : MonoBehaviour
 
         rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
 
+        // ダッシュ音を止める
+        playerSounds.StopDash();
+
         //ジャンプ音
         playerSounds.PlayJump();
+
+        hasJumped = true;
 
         isGround = false;
         jumpRequested = false;
@@ -208,6 +227,12 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGround = true;
+
+            if (hasJumped)
+            {
+                playerSounds.PlayLanding();
+                hasJumped = false;
+            }
         }
     }
 
@@ -216,8 +241,6 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGround = false;
-
-            playerSounds.PlayLanding();
         }
     }
 }

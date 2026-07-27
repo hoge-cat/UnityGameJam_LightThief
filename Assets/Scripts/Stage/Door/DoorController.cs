@@ -12,6 +12,8 @@ public class DoorController : MonoBehaviour
 
     private Transform player;
 
+    [SerializeField] private DoorSound doorSound;
+
     private bool isOpen;
     private Quaternion closedRotation;
     private Quaternion openedRotation;
@@ -72,6 +74,21 @@ public class DoorController : MonoBehaviour
         if (keyboardPressed || gamepadPressed)
         {
             isOpen = !isOpen;
+
+            if (isOpen)
+            {
+                if (doorSound != null)
+                {
+                    doorSound.PlayOpenSound();
+                }
+            }
+            else
+            {
+                if (doorSound != null)
+                {
+                    doorSound.PlayCloseSound();
+                }
+            }
         }
     }
 
