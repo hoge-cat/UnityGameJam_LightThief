@@ -151,4 +151,16 @@ public class EnemyVision : MonoBehaviour
             previousPoint = currentPoint;
         }
     }
+
+    public float GetDistanceToPlayer()
+    {
+        if (player == null)
+        {
+            return Mathf.Infinity;
+        }
+
+        return Vector3.Distance(
+            transform.position,
+            player.position);
+    }
 }
