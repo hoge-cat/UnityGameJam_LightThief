@@ -10,11 +10,14 @@ public class DoorController : MonoBehaviour
     [Header("操作設定")]
     [SerializeField] private float interactionDistance = 2.0f;
 
-    private Transform player;
-
+    [Header("効果音")]
     [SerializeField] private DoorSound doorSound;
 
+    private Transform player;
+
     private bool isOpen;
+    private bool wasPlayerInRange;
+
     private Quaternion closedRotation;
     private Quaternion openedRotation;
 
@@ -42,11 +45,11 @@ public class DoorController : MonoBehaviour
 
     private void Update()
     {
-        ReadInput();
+        UpdateInteraction();
         UpdateDoorRotation();
     }
 
-    private void ReadInput()
+    private void UpdateInteraction()
     {
         if (player == null)
         {
@@ -58,7 +61,24 @@ public class DoorController : MonoBehaviour
                 player.position,
                 transform.position);
 
-        if (distanceToPlayer > interactionDistance)
+        bool isPlayerInRange =
+            distanceToPlayer <= interactionDistance;
+
+        // ドアの範囲に入った瞬間
+        if (isPlayerInRange && !wasPlayerInRange)
+        {
+            TutorialUIManager.Instance?.ShowDoorPrompt(isOpen);
+        }
+
+        // ドアの範囲から出た瞬間
+        if (!isPlayerInRange && wasPlayerInRange)
+        {
+            TutorialUIManager.Instance?.HideDoorPrompt();
+        }
+
+        wasPlayerInRange = isPlayerInRange;
+
+        if (!isPlayerInRange)
         {
             return;
         }
@@ -75,20 +95,19 @@ public class DoorController : MonoBehaviour
         {
             isOpen = !isOpen;
 
-            if (isOpen)
+            if (doorSound != null)
             {
-                if (doorSound != null)
+                if (isOpen)
                 {
                     doorSound.PlayOpenSound();
                 }
-            }
-            else
-            {
-                if (doorSound != null)
+                else
                 {
                     doorSound.PlayCloseSound();
                 }
             }
+
+            TutorialUIManager.Instance?.SetDoorPrompt(isOpen);
         }
     }
 
@@ -102,5 +121,14 @@ public class DoorController : MonoBehaviour
                 transform.localRotation,
                 targetRotation,
                 openSpeed * Time.deltaTime);
+    }
+
+    private void OnDisable()
+    {
+        if (wasPlayerInRange)
+        {
+            TutorialUIManager.Instance?.HideDoorPrompt();
+            wasPlayerInRange = false;
+        }
     }
 }
