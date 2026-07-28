@@ -1,13 +1,23 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class TreasureItem : MonoBehaviour
 {
+    [Header("操作設定")]
     [SerializeField] private float interactionDistance = 2.0f;
 
+    [Header("取得演出")]
+    [SerializeField] private float collectDelay = 0.8f;
+
     private Transform player;
+    private Animator playerAnimator;
+
     private bool wasPlayerInRange;
     private bool hasCollected;
+
+    private static readonly int PickUpHash =
+        Animator.StringToHash("PickUp");
 
     private void Start()
     {
@@ -17,6 +27,8 @@ public class TreasureItem : MonoBehaviour
         if (playerObject != null)
         {
             player = playerObject.transform;
+            playerAnimator =
+                playerObject.GetComponentInChildren<Animator>();
         }
         else
         {
@@ -67,11 +79,11 @@ public class TreasureItem : MonoBehaviour
 
         if (keyboardPressed || gamepadPressed)
         {
-            Collect();
+            StartCollect();
         }
     }
 
-    private void Collect()
+    private void StartCollect()
     {
         if (hasCollected)
         {
@@ -85,6 +97,18 @@ public class TreasureItem : MonoBehaviour
             TutorialUIManager.Instance?.HideTreasurePrompt();
             wasPlayerInRange = false;
         }
+
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(PickUpHash);
+        }
+
+        StartCoroutine(CollectAfterAnimation());
+    }
+
+    private IEnumerator CollectAfterAnimation()
+    {
+        yield return new WaitForSeconds(collectDelay);
 
         TreasureManager.Instance?.CollectTreasure();
 
