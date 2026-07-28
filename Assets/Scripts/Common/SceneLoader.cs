@@ -5,25 +5,34 @@ public class SceneLoader : MonoBehaviour
 {
     public void LoadTitle()
     {
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene("Title");
     }
 
     public void LoadMain()
     {
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene("Main");
     }
 
-    public void LoadResult()
+    public void LoadGameClear()
     {
-        SceneManager.LoadScene("Result");
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene("GameClear");
+    }
+
+    public void LoadGameOver()
+    {
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene("GameOver");
     }
 
     public void QuitGame()
     {
-        Application.Quit();
-
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
 #endif
     }
 }
