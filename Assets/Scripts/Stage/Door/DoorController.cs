@@ -90,6 +90,14 @@ public class DoorController : MonoBehaviour
 
         if (keyboardPressed || gamepadPressed)
         {
+            PlayerScript playerScript =
+                player.GetComponent<PlayerScript>();
+
+            if (playerScript != null)
+            {
+                playerScript.PlayDoorAnimation();
+            }
+
             isOpen = !isOpen;
 
             TutorialUIManager.Instance?.SetDoorPrompt(isOpen);
