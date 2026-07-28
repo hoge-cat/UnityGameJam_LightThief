@@ -21,10 +21,13 @@ public class PlayerScript : MonoBehaviour
     private bool jumpRequested;
 
     private static readonly int SpeedHash =
-        Animator.StringToHash("Speed");
+    Animator.StringToHash("Speed");
 
     private static readonly int JumpHash =
-    Animator.StringToHash("Jump");
+        Animator.StringToHash("Jump");
+
+    private static readonly int DoorHash =
+        Animator.StringToHash("Door");
 
     private void Awake()
     {
@@ -256,6 +259,14 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGround = false;
+        }
+    }
+
+    public void PlayDoorAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(DoorHash);
         }
     }
 }
