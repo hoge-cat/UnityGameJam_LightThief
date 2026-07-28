@@ -51,11 +51,11 @@ MonoBehaviour:
   visionOrigin: {fileID: 228670051224796043}
   player: {fileID: 0}
   viewConeVisualizer: {fileID: 1109741154045745745}
-  detectionDistance: 12
-  viewAngle: 90
+  detectionDistance: 10
+  viewAngle: 80
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   alertTime: 0.5
 --- !u!114 &7162374537893558699
 MonoBehaviour:
@@ -71,8 +71,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SecurityCameraAlarm
   cameraVision: {fileID: 5660960321731892483}
   player: {fileID: 0}
-  alarmStartSE: {fileID: 0}
-  alarmLoopSE: {fileID: 0}
+  alarmStartSE: {fileID: 8300000, guid: bf693c826e88bd245a1a258bf761e20f, type: 3}
+  alarmLoopSE: {fileID: 8300000, guid: 72916b12ab87b0246b80168ce2ea300a, type: 3}
   enemyPrefab: {fileID: 3668072237167214820, guid: fc7a169f492eb5b458cbb56cf866ff2e, type: 3}
   spawnDistance: 5
   navMeshSearchDistance: 2
