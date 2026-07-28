@@ -5,6 +5,8 @@ public class EnemyChase : MonoBehaviour
 {
     [SerializeField] private Transform player;
 
+    public bool IsChasing { get; private set; }
+
     private NavMeshAgent agent;
 
     private void Awake()
@@ -41,6 +43,8 @@ public class EnemyChase : MonoBehaviour
             return;
         }
 
+        IsChasing = true;
+
         agent.SetDestination(player.position);
     }
 
@@ -50,6 +54,8 @@ public class EnemyChase : MonoBehaviour
         {
             return;
         }
+
+        IsChasing = false;
 
         if (agent.hasPath)
         {
