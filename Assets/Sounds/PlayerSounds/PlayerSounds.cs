@@ -3,82 +3,96 @@ using UnityEngine;
 public class PlayerSounds : MonoBehaviour
 {
     [Header("Audio Source")]
-    public AudioSource footstepSource; // 足音用
-    public AudioSource dashSource;       // ジャンプ・着地・ダッシュ用
-    public AudioSource seSource;       // ジャンプ・着地
-    private float dashTimer = 0f;
-    [SerializeField] private float dashInterval = 0.25f;
+    [SerializeField] private AudioSource footstepSource;
+    [SerializeField] private AudioSource dashSource;
+    [SerializeField] private AudioSource seSource;
 
     [Header("Sound Effects")]
-    public AudioClip footstepSE;
-    public AudioClip jumpSE;
-    public AudioClip landingSE;
-    public AudioClip dashSE;
-    private bool isDashPlaying = false;
+    [SerializeField] private AudioClip footstepSE;
+    [SerializeField] private AudioClip jumpSE;
+    [SerializeField] private AudioClip landingSE;
+    [SerializeField] private AudioClip dashSE;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        AudioSource[] sources = GetComponents<AudioSource>();
+    [Header("足音間隔")]
+    [SerializeField] private float walkInterval = 0.45f;
+    [SerializeField] private float dashInterval = 0.22f;
 
-        if (footstepSource == null && sources.Length > 0)
-            footstepSource = sources[0];
+    private float walkTimer;
+    private float dashTimer;
 
-        if (dashSource == null && sources.Length > 1)
-            dashSource = sources[1];
-
-        if (seSource == null && sources.Length > 2)
-            seSource = sources[2];
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // 足音
     public void PlayFootstep()
     {
-        if (!footstepSource.isPlaying)
+        if (footstepSource == null || footstepSE == null)
         {
+            return;
+        }
+
+        walkTimer -= Time.fixedDeltaTime;
+
+        if (walkTimer <= 0.0f)
+        {
+            footstepSource.Stop();
             footstepSource.clip = footstepSE;
             footstepSource.loop = false;
             footstepSource.Play();
+
+            walkTimer = walkInterval;
+        }
+    }
+
+    public void PlayDash()
+    {
+        if (dashSource == null || dashSE == null)
+        {
+            return;
+        }
+
+        dashTimer -= Time.fixedDeltaTime;
+
+        if (dashTimer <= 0.0f)
+        {
+            dashSource.Stop();
+            dashSource.clip = dashSE;
+            dashSource.loop = false;
+            dashSource.Play();
+
+            dashTimer = dashInterval;
         }
     }
 
     public void StopFootstep()
     {
-        footstepSource.Stop();
-    }
+        walkTimer = 0.0f;
 
-    // ジャンプ
-    public void PlayJump()
-    {
-        seSource.PlayOneShot(jumpSE);
-    }
-
-    //着地
-    public void PlayLanding()
-    {
-        seSource.PlayOneShot(landingSE);
-    }
-
-    // ダッシュ
-    public void PlayDash()
-    {
-        dashTimer -= Time.deltaTime;
-
-        if (dashTimer <= 0f)
+        if (footstepSource != null)
         {
-            dashTimer = dashInterval;
-            dashSource.PlayOneShot(dashSE);
+            footstepSource.Stop();
         }
     }
 
     public void StopDash()
     {
-        dashTimer = 0f;
+        dashTimer = 0.0f;
+
+        if (dashSource != null)
+        {
+            dashSource.Stop();
+        }
+    }
+
+    public void PlayJump()
+    {
+        if (seSource != null && jumpSE != null)
+        {
+            seSource.PlayOneShot(jumpSE);
+        }
+    }
+
+    public void PlayLanding()
+    {
+        if (seSource != null && landingSE != null)
+        {
+            seSource.PlayOneShot(landingSE);
+        }
     }
 }
