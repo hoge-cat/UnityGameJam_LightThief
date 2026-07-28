@@ -35,7 +35,7 @@ public class BatteryManager : MonoBehaviour
         {
             flashlightOn = false;
 
-            SceneManager.LoadScene("Result");
+            SceneManager.LoadScene("GameOver");
             return;
         }
 

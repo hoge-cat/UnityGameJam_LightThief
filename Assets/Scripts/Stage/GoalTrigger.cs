@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GoalTrigger : MonoBehaviour
 {
-    [SerializeField] private string resultSceneName = "Result";
+    [SerializeField] private string resultSceneName = "GameClear";
 
     private bool hasReachedGoal;
 
@@ -23,6 +23,7 @@ public class GoalTrigger : MonoBehaviour
 
         Debug.Log("ゴールしました");
 
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene(resultSceneName);
     }
 }
