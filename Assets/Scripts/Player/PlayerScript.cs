@@ -9,6 +9,9 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float dashSpeed = 5.0f;
     [SerializeField] private float jumpPower = 5.0f;
 
+    [Header("アニメーション設定")]
+    [SerializeField] private Animator animator;
+
     private Rigidbody rb;
     private Camera mainCamera;
 
@@ -17,10 +20,18 @@ public class PlayerScript : MonoBehaviour
     private bool isGround = true;
     private bool jumpRequested;
 
+    private static readonly int SpeedHash =
+        Animator.StringToHash("Speed");
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         mainCamera = Camera.main;
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
 
         // プレイヤーが物理演算で倒れないようにする
         rb.constraints =
@@ -32,6 +43,7 @@ public class PlayerScript : MonoBehaviour
     {
         ReadMoveInput();
         ReadJumpInput();
+        UpdateAnimation();
     }
 
     private void FixedUpdate()
@@ -76,7 +88,8 @@ public class PlayerScript : MonoBehaviour
         // ゲームパッド
         if (Gamepad.current != null)
         {
-            Vector2 stickInput = Gamepad.current.leftStick.ReadValue();
+            Vector2 stickInput =
+                Gamepad.current.leftStick.ReadValue();
 
             if (moveInput.sqrMagnitude <= 0.01f)
             {
@@ -89,7 +102,11 @@ public class PlayerScript : MonoBehaviour
             }
         }
 
-        moveInput = Vector2.ClampMagnitude(moveInput, 1.0f);
+        moveInput =
+            Vector2.ClampMagnitude(
+                moveInput,
+                1.0f
+            );
     }
 
     private void ReadJumpInput()
@@ -102,7 +119,8 @@ public class PlayerScript : MonoBehaviour
             Gamepad.current != null &&
             Gamepad.current.buttonSouth.wasPressedThisFrame;
 
-        if (isGround && (keyboardJump || gamepadJump))
+        if (isGround &&
+            (keyboardJump || gamepadJump))
         {
             jumpRequested = true;
         }
@@ -120,8 +138,11 @@ public class PlayerScript : MonoBehaviour
             }
         }
 
-        Vector3 cameraForward = mainCamera.transform.forward;
-        Vector3 cameraRight = mainCamera.transform.right;
+        Vector3 cameraForward =
+            mainCamera.transform.forward;
+
+        Vector3 cameraRight =
+            mainCamera.transform.right;
 
         // カメラの上下方向を無視
         cameraForward.y = 0.0f;
@@ -134,11 +155,14 @@ public class PlayerScript : MonoBehaviour
             cameraForward * moveInput.y +
             cameraRight * moveInput.x;
 
-        float currentSpeed = isDash ? dashSpeed : moveSpeed;
+        float currentSpeed =
+            isDash ? dashSpeed : moveSpeed;
 
         Vector3 nextPosition =
             rb.position +
-            moveDirection * currentSpeed * Time.fixedDeltaTime;
+            moveDirection *
+            currentSpeed *
+            Time.fixedDeltaTime;
 
         rb.MovePosition(nextPosition);
 
@@ -146,13 +170,17 @@ public class PlayerScript : MonoBehaviour
         if (moveDirection.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation =
-                Quaternion.LookRotation(moveDirection, Vector3.up);
+                Quaternion.LookRotation(
+                    moveDirection,
+                    Vector3.up
+                );
 
-            Quaternion newRotation = Quaternion.Slerp(
-                rb.rotation,
-                targetRotation,
-                12.0f * Time.fixedDeltaTime
-            );
+            Quaternion newRotation =
+    Quaternion.Slerp(
+        rb.rotation,
+        targetRotation,
+        6.0f * Time.fixedDeltaTime
+    );
 
             rb.MoveRotation(newRotation);
         }
@@ -165,19 +193,48 @@ public class PlayerScript : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity = new Vector3(
-            rb.linearVelocity.x,
-            0.0f,
-            rb.linearVelocity.z
-        );
+        rb.linearVelocity =
+            new Vector3(
+                rb.linearVelocity.x,
+                0.0f,
+                rb.linearVelocity.z
+            );
 
-        rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        rb.AddForce(
+            Vector3.up * jumpPower,
+            ForceMode.Impulse
+        );
 
         isGround = false;
         jumpRequested = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void UpdateAnimation()
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        float animationSpeed = 0.0f;
+
+        if (moveInput.sqrMagnitude > 0.01f)
+        {
+            animationSpeed =
+                isDash ? dashSpeed : moveSpeed;
+        }
+
+        animator.SetFloat(
+            SpeedHash,
+            animationSpeed,
+            0.1f,
+            Time.deltaTime
+        );
+    }
+
+    private void OnCollisionEnter(
+        Collision collision
+    )
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
@@ -185,7 +242,9 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnCollisionExit(
+        Collision collision
+    )
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
