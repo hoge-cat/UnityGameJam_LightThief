@@ -17,6 +17,11 @@ public class ResultInput : MonoBehaviour
     [SerializeField] private float inputDelay = 0.5f;
     [SerializeField] private float repeatDelay = 0.2f;
 
+    [Header("効果音")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip cursorMoveSound;
+    [SerializeField] private AudioClip submitSound;
+
     private int selectedIndex;
     private float elapsedTime;
     private float lastMoveTime;
@@ -84,13 +89,21 @@ public class ResultInput : MonoBehaviour
 
         if (moveUp)
         {
-            selectedIndex = 0;
-            UpdateMenuDisplay();
+            if (selectedIndex != 0)
+            {
+                selectedIndex = 0;
+                PlaySound(cursorMoveSound);
+                UpdateMenuDisplay();
+            }
         }
         else if (moveDown)
         {
-            selectedIndex = 1;
-            UpdateMenuDisplay();
+            if (selectedIndex != 1)
+            {
+                selectedIndex = 1;
+                PlaySound(cursorMoveSound);
+                UpdateMenuDisplay();
+            }
         }
     }
 
@@ -114,6 +127,9 @@ public class ResultInput : MonoBehaviour
         }
 
         isLoading = true;
+
+        PlaySound(submitSound);
+
         Time.timeScale = 1.0f;
 
         if (selectedIndex == 0)
@@ -128,20 +144,43 @@ public class ResultInput : MonoBehaviour
 
     private void UpdateMenuDisplay()
     {
+        Color selectedColor = Color.yellow;
+        Color normalColor = Color.white;
+
         if (retryText != null)
         {
             retryText.text =
                 selectedIndex == 0
-                    ? "> もう一度"
-                    : "  もう一度";
+                ? "> もう一度"
+                : "  もう一度";
+
+            retryText.color =
+                selectedIndex == 0
+                ? selectedColor
+                : normalColor;
         }
 
         if (titleText != null)
         {
             titleText.text =
                 selectedIndex == 1
-                    ? "> タイトルへ戻る"
-                    : "  タイトルへ戻る";
+                ? "> タイトルへ戻る"
+                : "  タイトルへ戻る";
+
+            titleText.color =
+                selectedIndex == 1
+                ? selectedColor
+                : normalColor;
         }
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(clip);
     }
 }
