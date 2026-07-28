@@ -1,539 +1,327 @@
 using UnityEngine;
-
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
-
 public class PlayerScript : MonoBehaviour
-
 {
-
     [Header("移動設定")]
-
     [SerializeField] private float moveSpeed = 2.5f;
-
     [SerializeField] private float dashSpeed = 5.0f;
-
     [SerializeField] private float jumpPower = 5.0f;
 
     [Header("アニメーション設定")]
-
     [SerializeField] private Animator animator;
 
     private Rigidbody rb;
-
     private Camera mainCamera;
-
     private PlayerSounds playerSounds;
 
     private Vector2 moveInput;
-
     private bool isDash;
-
     private bool isGround = true;
-
     private bool jumpRequested;
-
     private bool hasJumped;
 
     private static readonly int SpeedHash =
-
         Animator.StringToHash("Speed");
 
     private static readonly int JumpHash =
-
         Animator.StringToHash("Jump");
 
     private static readonly int DoorHash =
-
         Animator.StringToHash("Door");
 
     private void Awake()
-
     {
-
         rb = GetComponent<Rigidbody>();
-
         mainCamera = Camera.main;
-
         playerSounds = GetComponent<PlayerSounds>();
 
         if (animator == null)
-
         {
-
             animator = GetComponentInChildren<Animator>();
-
         }
 
-        // プレイヤーが物理演算で倒れないようにする
-
         rb.constraints =
-
             RigidbodyConstraints.FreezeRotationX |
-
             RigidbodyConstraints.FreezeRotationZ;
-
     }
 
     private void Update()
-
     {
-
         ReadMoveInput();
-
         ReadJumpInput();
-
         UpdateAnimation();
-
     }
 
     private void FixedUpdate()
-
     {
-
         MovePlayer();
-
         JumpPlayer();
-
     }
 
     private void ReadMoveInput()
-
     {
-
         moveInput = Vector2.zero;
-
         isDash = false;
 
-        // キーボード
-
         if (Keyboard.current != null)
-
         {
-
             if (Keyboard.current.wKey.isPressed)
-
             {
-
                 moveInput.y += 1.0f;
-
             }
 
             if (Keyboard.current.sKey.isPressed)
-
             {
-
                 moveInput.y -= 1.0f;
-
             }
 
             if (Keyboard.current.dKey.isPressed)
-
             {
-
                 moveInput.x += 1.0f;
-
             }
 
             if (Keyboard.current.aKey.isPressed)
-
             {
-
                 moveInput.x -= 1.0f;
-
             }
 
             isDash =
-
                 Keyboard.current.leftShiftKey.isPressed ||
-
                 Keyboard.current.rightShiftKey.isPressed;
-
         }
 
-        // ゲームパッド
-
         if (Gamepad.current != null)
-
         {
-
             Vector2 stickInput =
-
                 Gamepad.current.leftStick.ReadValue();
 
             if (moveInput.sqrMagnitude <= 0.01f)
-
             {
-
                 moveInput = stickInput;
-
             }
 
             if (Gamepad.current.buttonWest.isPressed)
-
             {
-
                 isDash = true;
-
             }
-
         }
 
         moveInput =
-
             Vector2.ClampMagnitude(moveInput, 1.0f);
 
-        // スティックの微小入力を無視
-
         if (moveInput.magnitude < 0.15f)
-
         {
-
             moveInput = Vector2.zero;
-
         }
-
     }
 
     private void ReadJumpInput()
-
     {
-
         bool keyboardJump =
-
             Keyboard.current != null &&
-
             Keyboard.current.spaceKey.wasPressedThisFrame;
 
         bool gamepadJump =
-
             Gamepad.current != null &&
-
             Gamepad.current.buttonSouth.wasPressedThisFrame;
 
         if (isGround &&
-
             (keyboardJump || gamepadJump))
-
         {
-
             jumpRequested = true;
-
         }
-
     }
 
     private void MovePlayer()
-
     {
-
         if (mainCamera == null)
-
         {
-
             mainCamera = Camera.main;
 
             if (mainCamera == null)
-
             {
-
                 StopMovementSounds();
-
                 return;
-
             }
-
         }
 
         Vector3 cameraForward =
-
             mainCamera.transform.forward;
 
         Vector3 cameraRight =
-
             mainCamera.transform.right;
 
-        // カメラの上下方向を無視
-
         cameraForward.y = 0.0f;
-
         cameraRight.y = 0.0f;
 
         cameraForward.Normalize();
-
         cameraRight.Normalize();
 
         Vector3 moveDirection =
-
             cameraForward * moveInput.y +
-
             cameraRight * moveInput.x;
 
         if (moveDirection.sqrMagnitude <= 0.001f)
-
         {
-
             StopMovementSounds();
-
             return;
-
         }
 
         UpdateMovementSounds();
 
         float currentSpeed =
-
             isDash ? dashSpeed : moveSpeed;
 
         Vector3 nextPosition =
-
             rb.position +
-
             moveDirection *
-
             currentSpeed *
-
             Time.fixedDeltaTime;
 
         rb.MovePosition(nextPosition);
 
-        // 移動方向へキャラクターを向ける
-
         Quaternion targetRotation =
-
             Quaternion.LookRotation(
-
                 moveDirection,
-
                 Vector3.up
-
             );
 
         Quaternion newRotation =
-
             Quaternion.Slerp(
-
                 rb.rotation,
-
                 targetRotation,
-
                 6.0f * Time.fixedDeltaTime
-
             );
 
         rb.MoveRotation(newRotation);
-
     }
 
     private void UpdateMovementSounds()
-
     {
-
         if (playerSounds == null)
-
         {
-
             return;
-
         }
 
         if (!isGround)
-
         {
-
             StopMovementSounds();
-
             return;
-
         }
 
         if (isDash)
-
         {
-
             playerSounds.StopFootstep();
-
             playerSounds.PlayDash();
-
         }
-
         else
-
         {
-
             playerSounds.StopDash();
-
             playerSounds.PlayFootstep();
-
         }
-
     }
 
     private void StopMovementSounds()
-
     {
-
         if (playerSounds == null)
-
         {
-
             return;
-
         }
 
         playerSounds.StopFootstep();
-
         playerSounds.StopDash();
-
     }
 
     private void JumpPlayer()
-
     {
-
         if (!jumpRequested)
-
         {
-
             return;
-
         }
 
         if (animator != null)
-
         {
-
             animator.SetTrigger(JumpHash);
-
         }
 
         rb.linearVelocity = new Vector3(
-
             rb.linearVelocity.x,
-
             0.0f,
-
             rb.linearVelocity.z
-
         );
 
         rb.AddForce(
-
             Vector3.up * jumpPower,
-
             ForceMode.Impulse
-
         );
 
         if (playerSounds != null)
-
         {
-
             playerSounds.StopFootstep();
-
             playerSounds.StopDash();
-
             playerSounds.PlayJump();
-
         }
 
         hasJumped = true;
-
         isGround = false;
-
         jumpRequested = false;
-
     }
 
     private void UpdateAnimation()
-
     {
-
         if (animator == null)
-
         {
-
             return;
-
         }
 
         float animationSpeed = 0.0f;
 
         if (moveInput.sqrMagnitude > 0.01f)
-
         {
-
             animationSpeed =
-
                 isDash ? dashSpeed : moveSpeed;
-
         }
 
         animator.SetFloat(
-
             SpeedHash,
-
             animationSpeed,
-
             0.1f,
-
             Time.deltaTime
-
         );
-
     }
 
     private void OnCollisionEnter(Collision collision)
-
     {
-
         if (!collision.gameObject.CompareTag("Ground"))
-
         {
-
             return;
-
         }
 
         isGround = true;
 
         if (hasJumped)
-
         {
-
             playerSounds?.PlayLanding();
-
             hasJumped = false;
-
         }
-
     }
 
     private void OnCollisionExit(Collision collision)
-
     {
-
         if (collision.gameObject.CompareTag("Ground"))
-
         {
-
             isGround = false;
-
+            StopMovementSounds();
         }
-
     }
 
     public void PlayDoorAnimation()
-
     {
-
         if (animator != null)
-
         {
-
             animator.SetTrigger(DoorHash);
-
         }
     }
 
