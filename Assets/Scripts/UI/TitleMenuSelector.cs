@@ -5,14 +5,46 @@ using UnityEngine.UI;
 
 public class TitleMenuSelector : MonoBehaviour
 {
+    [Header("ç≈èâÇÃëIë")]
     [SerializeField] private Button firstSelectedButton;
+
+    [Header("ÉÅÉjÉÖÅ[âπ")]
+    [SerializeField] private TitleMenuSounds menuSounds;
+
+    private GameObject previousSelectedObject;
 
     private void Start()
     {
         SelectFirstButton();
+
+        if (EventSystem.current != null)
+        {
+            previousSelectedObject =
+                EventSystem.current.currentSelectedGameObject;
+        }
     }
 
     private void Update()
+    {
+        RestoreSelection();
+
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        GameObject currentSelectedObject =
+            EventSystem.current.currentSelectedGameObject;
+
+        if (currentSelectedObject != null &&
+            currentSelectedObject != previousSelectedObject)
+        {
+            menuSounds?.PlayMove();
+            previousSelectedObject = currentSelectedObject;
+        }
+    }
+
+    private void RestoreSelection()
     {
         bool keyboardInput =
             Keyboard.current != null &&
@@ -57,6 +89,7 @@ public class TitleMenuSelector : MonoBehaviour
         }
 
         EventSystem.current.SetSelectedGameObject(null);
+
         EventSystem.current.SetSelectedGameObject(
             firstSelectedButton.gameObject
         );
