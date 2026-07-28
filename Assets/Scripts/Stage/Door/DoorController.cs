@@ -10,6 +10,9 @@ public class DoorController : MonoBehaviour
     [Header("操作設定")]
     [SerializeField] private float interactionDistance = 2.0f;
 
+    [Header("効果音")]
+    [SerializeField] private DoorSound doorSound;
+
     private Transform player;
 
     private bool isOpen;
@@ -99,6 +102,18 @@ public class DoorController : MonoBehaviour
             }
 
             isOpen = !isOpen;
+
+            if (doorSound != null)
+            {
+                if (isOpen)
+                {
+                    doorSound.PlayOpenSound();
+                }
+                else
+                {
+                    doorSound.PlayCloseSound();
+                }
+            }
 
             TutorialUIManager.Instance?.SetDoorPrompt(isOpen);
         }

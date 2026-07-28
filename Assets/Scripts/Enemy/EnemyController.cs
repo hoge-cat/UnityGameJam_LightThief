@@ -13,6 +13,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private EnemyVision enemyVision;
     [SerializeField] private EnemyChase enemyChase;
     [SerializeField] private EnemyAnimator enemyAnimator;
+    [SerializeField] private EnemyScript enemySound;
 
     [Header("攻撃設定")]
     [SerializeField] private float attackDistance = 1.5f;
@@ -229,6 +230,11 @@ public class EnemyController : MonoBehaviour
         if (enemyAnimator != null)
         {
             enemyAnimator.PlayAttack();
+        }
+
+        if (enemySound != null)
+        {
+            enemySound.PlayAttackSE();
         }
 
         if (batteryManager != null)

@@ -7,6 +7,12 @@ public class SecurityCameraAlarm : MonoBehaviour
     [SerializeField] private SecurityCameraVision cameraVision;
     [SerializeField] private Transform player;
 
+    [Header("サウンド")]
+    [SerializeField] private AudioClip alarmStartSE;
+    [SerializeField] private AudioClip alarmLoopSE;
+
+    private AudioSource audioSource;
+
     [Header("敵出現設定")]
     [SerializeField] private GameObject enemyPrefab;
 
@@ -30,6 +36,13 @@ public class SecurityCameraAlarm : MonoBehaviour
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         if (player != null)
         {
             return;
@@ -71,10 +84,17 @@ public class SecurityCameraAlarm : MonoBehaviour
             return;
         }
 
-        if (isAlarmActive || hasSpawnedEnemy)
+        // 敵が出た後でも視界チェックする
+        if (hasSpawnedEnemy)
         {
+            if (!cameraVision.CanSeePlayer())
+            {
+                StopAlarm();
+            }
+
             return;
         }
+
 
         if (cameraVision.CanSeePlayer())
         {
@@ -93,6 +113,21 @@ public class SecurityCameraAlarm : MonoBehaviour
 
         Debug.Log(
             "警報発動：敵を出現させます");
+
+        // 発見音
+        if (alarmStartSE != null)
+        {
+            audioSource.PlayOneShot(alarmStartSE);
+        }
+
+
+        // 警報ループ
+        if (alarmLoopSE != null)
+        {
+            audioSource.clip = alarmLoopSE;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
 
         SpawnEnemy();
     }
@@ -296,6 +331,13 @@ public class SecurityCameraAlarm : MonoBehaviour
          * この時点ではすぐ再出現させず、
          * プレイヤーが一度視界から出るまで待つ。
          */
+        // 警報停止
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            audioSource.loop = false;
+        }
+
         waitingForPlayerToLeave = true;
 
         Debug.Log(
@@ -306,6 +348,20 @@ public class SecurityCameraAlarm : MonoBehaviour
     {
         isAlarmActive = false;
         hasSpawnedEnemy = false;
+    }
+
+    private void StopAlarm()
+    {
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
+            audioSource.loop = false;
+        }
+
+        isAlarmActive = false;
+
+        Debug.Log("警報停止");
     }
 
     public bool IsAlarmActive()
