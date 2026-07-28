@@ -23,6 +23,9 @@ public class PlayerScript : MonoBehaviour
     private static readonly int SpeedHash =
         Animator.StringToHash("Speed");
 
+    private static readonly int JumpHash =
+    Animator.StringToHash("Jump");
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -193,12 +196,16 @@ public class PlayerScript : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity =
-            new Vector3(
-                rb.linearVelocity.x,
-                0.0f,
-                rb.linearVelocity.z
-            );
+        if (animator != null)
+        {
+            animator.SetTrigger(JumpHash);
+        }
+
+        rb.linearVelocity = new Vector3(
+            rb.linearVelocity.x,
+            0.0f,
+            rb.linearVelocity.z
+        );
 
         rb.AddForce(
             Vector3.up * jumpPower,
