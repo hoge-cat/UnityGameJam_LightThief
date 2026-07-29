@@ -17,6 +17,10 @@ public class TutorialUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI tutorialText;
     [SerializeField] private CanvasGroup tutorialCanvasGroup;
 
+    [Header("インタラクト表示")]
+    [SerializeField] private TextMeshProUGUI interactionPromptText;
+    [SerializeField] private CanvasGroup interactionPromptCanvasGroup;
+
     [Header("右下の操作一覧")]
     [SerializeField] private TextMeshProUGUI operationGuideText;
     [SerializeField] private CanvasGroup operationGuideCanvasGroup;
@@ -56,6 +60,19 @@ public class TutorialUIManager : MonoBehaviour
         {
             operationGuideCanvasGroup.alpha = 0.0f;
             operationGuideCanvasGroup.gameObject.SetActive(false);
+        }
+
+        if (interactionPromptText != null)
+        {
+            interactionPromptText.gameObject.SetActive(true);
+            interactionPromptText.canvasRenderer.SetAlpha(0.0f);
+        }
+
+        if (interactionPromptCanvasGroup != null)
+        {
+            interactionPromptCanvasGroup.alpha = 0.0f;
+            interactionPromptCanvasGroup.interactable = false;
+            interactionPromptCanvasGroup.blocksRaycasts = false;
         }
 
         RefreshText();
@@ -211,8 +228,9 @@ public class TutorialUIManager : MonoBehaviour
         }
 
         tutorialCanvasGroup.alpha = 0.0f;
+        tutorialText.canvasRenderer.SetAlpha(0.0f);
 
-        // TutorialText自体は無効化しない
+        // TutorialTextは無効化しない
         tutorialText.gameObject.SetActive(true);
 
         isFirstTutorialFading = false;
@@ -337,6 +355,8 @@ public class TutorialUIManager : MonoBehaviour
 
     public void ShowTreasurePrompt()
     {
+        Debug.Log("宝の操作表示を開始");
+
         nearbyTreasureCount++;
         RefreshText();
     }
@@ -353,20 +373,15 @@ public class TutorialUIManager : MonoBehaviour
 
     private void RefreshText()
     {
-        if (tutorialText == null ||
-            isFirstTutorialFading)
-        {
-            return;
-        }
-
         if (nearbyTreasureCount > 0)
         {
-            ShowTutorialText(
+            string prompt =
                 currentInputDevice ==
                 InputDeviceType.Gamepad
-                    ? "[ B ]  宝を取得"
-                    : "[ E ]  宝を取得");
+                    ? "[ B ] 宝を取得"
+                    : "[ E ] 宝を取得";
 
+            ShowInteractionPrompt(prompt);
             return;
         }
 
@@ -380,10 +395,18 @@ public class TutorialUIManager : MonoBehaviour
             string prompt =
                 currentInputDevice ==
                 InputDeviceType.Gamepad
-                    ? $"[ B ]  ドアを{actionText}"
-                    : $"[ E ]  ドアを{actionText}";
+                    ? $"[ B ] ドアを{actionText}"
+                    : $"[ E ] ドアを{actionText}";
 
-            ShowTutorialText(prompt);
+            ShowInteractionPrompt(prompt);
+            return;
+        }
+
+        HideInteractionPrompt();
+
+        if (tutorialText == null ||
+            isFirstTutorialFading)
+        {
             return;
         }
 
@@ -417,9 +440,13 @@ public class TutorialUIManager : MonoBehaviour
         textColor.a = 1.0f;
         tutorialText.color = textColor;
 
+        tutorialText.canvasRenderer.SetAlpha(1.0f);
+
         if (tutorialCanvasGroup != null)
         {
             tutorialCanvasGroup.alpha = 1.0f;
+            tutorialCanvasGroup.interactable = false;
+            tutorialCanvasGroup.blocksRaycasts = false;
         }
     }
 
@@ -430,12 +457,70 @@ public class TutorialUIManager : MonoBehaviour
             return;
         }
 
-        // オブジェクトは無効化せず透明にする
+        // GameObject自体は無効化せず、透明にする
         tutorialText.gameObject.SetActive(true);
 
         if (tutorialCanvasGroup != null)
         {
             tutorialCanvasGroup.alpha = 0.0f;
         }
+
+        tutorialText.canvasRenderer.SetAlpha(0.0f);
+    }
+
+    private void ShowInteractionPrompt(string message)
+    {
+        Debug.Log(
+            $"インタラクト表示: {message}");
+
+        if (interactionPromptText == null)
+        {
+            Debug.LogWarning(
+                "InteractionPromptTextが設定されていません。");
+
+            return;
+        }
+
+        interactionPromptText.gameObject.SetActive(true);
+        interactionPromptText.enabled = true;
+        interactionPromptText.text = message;
+
+        Color textColor =
+            interactionPromptText.color;
+
+        textColor.a = 1.0f;
+        interactionPromptText.color = textColor;
+
+        interactionPromptText.canvasRenderer.SetAlpha(1.0f);
+
+        if (interactionPromptCanvasGroup != null)
+        {
+            interactionPromptCanvasGroup.alpha = 1.0f;
+            interactionPromptCanvasGroup.interactable = false;
+            interactionPromptCanvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    private void HideInteractionPrompt()
+    {
+        if (interactionPromptText == null)
+        {
+            return;
+        }
+
+        // オブジェクト自体は無効化しない
+        interactionPromptText.gameObject.SetActive(true);
+
+        if (interactionPromptCanvasGroup != null)
+        {
+            interactionPromptCanvasGroup.alpha = 0.0f;
+        }
+
+        interactionPromptText.canvasRenderer.SetAlpha(0.0f);
+    }
+
+    public void RefreshInteractionPrompt()
+    {
+        RefreshText();
     }
 }

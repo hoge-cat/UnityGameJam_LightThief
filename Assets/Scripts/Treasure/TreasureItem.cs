@@ -52,12 +52,16 @@ public class TreasureItem : MonoBehaviour
         bool isPlayerInRange =
             distanceToPlayer <= interactionDistance;
 
-        if (isPlayerInRange && !wasPlayerInRange)
+        if (isPlayerInRange)
         {
-            TutorialUIManager.Instance?.ShowTreasurePrompt();
-        }
+            if (!wasPlayerInRange)
+            {
+                TutorialUIManager.Instance?.ShowTreasurePrompt();
+            }
 
-        if (!isPlayerInRange && wasPlayerInRange)
+            TutorialUIManager.Instance?.RefreshInteractionPrompt();
+        }
+        else if (wasPlayerInRange)
         {
             TutorialUIManager.Instance?.HideTreasurePrompt();
         }
