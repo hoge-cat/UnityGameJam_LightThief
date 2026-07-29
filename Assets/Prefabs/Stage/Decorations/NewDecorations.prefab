@@ -4295,34 +4295,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3713244509486120464, guid: 93488e3e4bc0fa54d8804070c196ab4d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7660666389979010349}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93488e3e4bc0fa54d8804070c196ab4d, type: 3}
 --- !u!4 &6186889678560705522 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3485746893004104343, guid: 93488e3e4bc0fa54d8804070c196ab4d, type: 3}
   m_PrefabInstance: {fileID: 7314940043620669797}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6200325304814970741 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3713244509486120464, guid: 93488e3e4bc0fa54d8804070c196ab4d, type: 3}
-  m_PrefabInstance: {fileID: 7314940043620669797}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7660666389979010349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6200325304814970741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2113de43bd678c4abfa9d00f043648e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
-  resultSceneName: GameClear
 --- !u!1001 &8024220666617760552
 PrefabInstance:
   m_ObjectHideFlags: 0

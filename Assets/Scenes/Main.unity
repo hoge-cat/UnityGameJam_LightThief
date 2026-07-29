@@ -969,8 +969,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6186889678560705522, guid: 06ac89e583519234c961eb874443d874, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1242418934}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6200325304814970741, guid: 06ac89e583519234c961eb874443d874, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 424672024}
   m_SourcePrefab: {fileID: 100100000, guid: 06ac89e583519234c961eb874443d874, type: 3}
 --- !u!4 &381514089 stripped
 Transform:
@@ -1035,6 +1041,31 @@ Transform:
   - {fileID: 1763809813}
   m_Father: {fileID: 181257087}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &424672018 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6200325304814970741, guid: 06ac89e583519234c961eb874443d874, type: 3}
+  m_PrefabInstance: {fileID: 374365524}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &424672019 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6186889678560705522, guid: 06ac89e583519234c961eb874443d874, type: 3}
+  m_PrefabInstance: {fileID: 374365524}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &424672024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424672018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3229fd2ee9538d04d8d2aa6e32fe09db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalDoor
+  leftDoor: {fileID: 511141633}
+  rightDoor: {fileID: 1156801190}
+  goalTriggerCollider: {fileID: 1242418936}
 --- !u!1 &447490447 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1835644175007229239, guid: 3133ee2f8f33edd4ba72c935dc9d85ea, type: 3}
@@ -1373,6 +1404,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.064753, y: 2.4654012, z: 1.2349306}
   m_Center: {x: 0.0424012, y: 1.2327006, z: 0.04800812}
+--- !u!1 &511141633 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2234633686274495882, guid: 06ac89e583519234c961eb874443d874, type: 3}
+  m_PrefabInstance: {fileID: 374365524}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &512220237 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3863679522576456731, guid: 3133ee2f8f33edd4ba72c935dc9d85ea, type: 3}
@@ -3918,6 +3954,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1408914150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1156801190 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6651963807647038602, guid: 06ac89e583519234c961eb874443d874, type: 3}
+  m_PrefabInstance: {fileID: 374365524}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1184192271
 GameObject:
   m_ObjectHideFlags: 0
@@ -3975,6 +4016,74 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06462914, y: 0.12728883, z: 0.04841695}
   m_Center: {x: 0.000000029802322, y: 0, z: 0.0000000055879354}
+--- !u!1 &1242418933
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1242418934}
+  - component: {fileID: 1242418936}
+  - component: {fileID: 1242418935}
+  m_Layer: 0
+  m_Name: GoalTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1242418934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242418933}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 424672019}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1242418935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242418933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2113de43bd678c4abfa9d00f043648e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
+  goalDoor: {fileID: 424672024}
+  resultSceneName: GameClear
+--- !u!65 &1242418936
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242418933}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.791403, y: 11.4931755, z: 4.1632605}
+  m_Center: {x: 0.0008725873, y: 5.2465906, z: -1.4878981}
 --- !u!4 &1325940007 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9174656862921743042, guid: 3133ee2f8f33edd4ba72c935dc9d85ea, type: 3}
@@ -5345,7 +5454,7 @@ MonoBehaviour:
   objectiveText: {fileID: 1726780109}
   goalMessageText: {fileID: 879869969}
   goalMessageDuration: 4
-  goalObject: {fileID: 2008177262}
+  goalDoor: {fileID: 424672024}
 --- !u!4 &1994184996
 Transform:
   m_ObjectHideFlags: 0
@@ -5393,6 +5502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2113de43bd678c4abfa9d00f043648e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
+  goalDoor: {fileID: 0}
   resultSceneName: GameClear
 --- !u!65 &2008177264
 BoxCollider:

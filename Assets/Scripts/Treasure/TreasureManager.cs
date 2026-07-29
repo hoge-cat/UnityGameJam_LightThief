@@ -15,7 +15,7 @@ public class TreasureManager : MonoBehaviour
     [SerializeField] private float goalMessageDuration = 4.0f;
 
     [Header("ゴール設定")]
-    [SerializeField] private GameObject goalObject;
+    [SerializeField] private GoalDoor goalDoor;
 
     private int collectedTreasure;
     private int totalTreasure;
@@ -34,11 +34,6 @@ public class TreasureManager : MonoBehaviour
             );
 
         totalTreasure = treasures.Length;
-
-        if (goalObject != null)
-        {
-            goalObject.SetActive(false);
-        }
 
         if (objectiveText != null)
         {
@@ -100,9 +95,14 @@ public class TreasureManager : MonoBehaviour
     {
         hasActivatedGoal = true;
 
-        if (goalObject != null)
+        if (goalDoor != null)
         {
-            goalObject.SetActive(true);
+            goalDoor.UnlockGoal();
+        }
+        else
+        {
+            Debug.LogWarning(
+                "TreasureManager：GoalDoorが設定されていません。");
         }
 
         if (objectiveText != null)
@@ -118,7 +118,7 @@ public class TreasureManager : MonoBehaviour
         }
 
         Debug.Log(
-            "すべての宝を集めました。出口が有効になりました。"
+            "すべての宝を集めました。出口が解放されました。"
         );
     }
 
@@ -126,7 +126,7 @@ public class TreasureManager : MonoBehaviour
     {
         goalMessageText.text =
             "宝を集めきった!\n" +
-            "どこかに脱出地点が出現したようだ";
+            "脱出地点へ向かえ";
 
         goalMessageText.gameObject.SetActive(true);
 
