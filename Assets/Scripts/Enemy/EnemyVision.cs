@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class EnemyVision : MonoBehaviour
 {
+    [Header("視界設定")]
     [SerializeField] private Transform player;
     [SerializeField] private float detectionDistance = 5.0f;
     [SerializeField] private float viewAngle = 90.0f;
     [SerializeField] private LayerMask obstacleLayer;
+
+    [Header("ライトによる発見距離補正")]
+    [SerializeField] private float lightOnMultiplier = 1.5f;
+    [SerializeField] private float lightOffMultiplier = 0.6f;
+
+    private FlashlightController flashlightController;
 
     private void Start()
     {
@@ -22,6 +29,18 @@ public class EnemyVision : MonoBehaviour
             {
                 Debug.LogWarning(
                     "EnemyVision：Playerタグのオブジェクトが見つかりません。");
+            }
+        }
+
+        if (player != null)
+        {
+            flashlightController =
+                player.GetComponentInChildren<FlashlightController>();
+
+            if (flashlightController == null)
+            {
+                Debug.LogWarning(
+                    "EnemyVision：FlashlightControllerが見つかりません。");
             }
         }
     }
@@ -45,7 +64,10 @@ public class EnemyVision : MonoBehaviour
         float distanceToPlayer =
             directionToPlayer.magnitude;
 
-        if (distanceToPlayer > detectionDistance)
+        float currentDetectionDistance =
+            GetCurrentDetectionDistance();
+
+        if (distanceToPlayer > currentDetectionDistance)
         {
             return false;
         }
@@ -83,13 +105,36 @@ public class EnemyVision : MonoBehaviour
         }
 
         float distanceToPlayer =
-            Vector3.Distance(transform.position, player.position);
+            Vector3.Distance(
+                transform.position,
+                player.position);
 
-        return distanceToPlayer <= detectionDistance;
+        return distanceToPlayer <=
+               GetCurrentDetectionDistance();
+    }
+
+    private float GetCurrentDetectionDistance()
+    {
+        if (flashlightController == null)
+        {
+            return detectionDistance;
+        }
+
+        if (flashlightController.IsLightOn())
+        {
+            return detectionDistance * lightOnMultiplier;
+        }
+
+        return detectionDistance * lightOffMultiplier;
     }
 
     private void OnDrawGizmosSelected()
     {
+        float currentDetectionDistance =
+            Application.isPlaying
+                ? GetCurrentDetectionDistance()
+                : detectionDistance;
+
         if (Application.isPlaying && CanSeePlayer())
         {
             Gizmos.color = Color.red;
@@ -118,16 +163,16 @@ public class EnemyVision : MonoBehaviour
 
         Gizmos.DrawLine(
             origin,
-            origin + leftDirection * detectionDistance);
+            origin + leftDirection * currentDetectionDistance);
 
         Gizmos.DrawLine(
             origin,
-            origin + rightDirection * detectionDistance);
+            origin + rightDirection * currentDetectionDistance);
 
         const int segmentCount = 30;
 
         Vector3 previousPoint =
-            origin + leftDirection * detectionDistance;
+            origin + leftDirection * currentDetectionDistance;
 
         for (int i = 1; i <= segmentCount; i++)
         {
@@ -142,7 +187,7 @@ public class EnemyVision : MonoBehaviour
                 * transform.forward;
 
             Vector3 currentPoint =
-                origin + direction * detectionDistance;
+                origin + direction * currentDetectionDistance;
 
             Gizmos.DrawLine(
                 previousPoint,

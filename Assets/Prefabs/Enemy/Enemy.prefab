@@ -470,8 +470,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyVision
   player: {fileID: 0}
-  detectionDistance: 20
-  viewAngle: 70
+  detectionDistance: 15
+  viewAngle: 90
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64

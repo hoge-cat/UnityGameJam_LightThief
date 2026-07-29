@@ -75,7 +75,7 @@ public class TreasureItem : MonoBehaviour
 
         bool gamepadPressed =
             Gamepad.current != null &&
-            Gamepad.current.buttonNorth.wasPressedThisFrame;
+            Gamepad.current.buttonEast.wasPressedThisFrame;
 
         if (keyboardPressed || gamepadPressed)
         {
