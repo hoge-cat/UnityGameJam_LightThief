@@ -27,6 +27,7 @@ public class TitleMenuSelector : MonoBehaviour
     private void Update()
     {
         RestoreSelection();
+        ReadSubmitInput();
 
         if (EventSystem.current == null)
         {
@@ -77,6 +78,58 @@ public class TitleMenuSelector : MonoBehaviour
         if (EventSystem.current.currentSelectedGameObject == null)
         {
             SelectFirstButton();
+        }
+    }
+
+    private void ReadSubmitInput()
+    {
+        bool keyboardSubmit =
+            Keyboard.current != null &&
+            (
+                Keyboard.current.spaceKey.wasPressedThisFrame ||
+                Keyboard.current.enterKey.wasPressedThisFrame ||
+                Keyboard.current.numpadEnterKey.wasPressedThisFrame
+            );
+
+        if (!keyboardSubmit)
+        {
+            return;
+        }
+
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        GameObject selectedObject =
+            EventSystem.current.currentSelectedGameObject;
+
+        if (selectedObject == null)
+        {
+            SelectFirstButton();
+
+            selectedObject =
+                EventSystem.current.currentSelectedGameObject;
+        }
+
+        if (selectedObject == null)
+        {
+            return;
+        }
+
+        Button selectedButton =
+            selectedObject.GetComponent<Button>();
+
+        if (selectedButton == null)
+        {
+            selectedButton =
+                selectedObject.GetComponentInParent<Button>();
+        }
+
+        if (selectedButton != null &&
+            selectedButton.interactable)
+        {
+            selectedButton.onClick.Invoke();
         }
     }
 
