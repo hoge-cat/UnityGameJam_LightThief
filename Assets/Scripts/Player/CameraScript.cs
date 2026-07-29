@@ -3,24 +3,37 @@ using UnityEngine.InputSystem;
 
 public class CameraScript : MonoBehaviour
 {
+    [Header("追従設定")]
     public Transform target;
 
     public float distance = 5f;
     public float height = 2f;
-    public float mouseSensitivity = 3.0f;
-    public float cameraRotateSpeed = 120f;
     public float followSpeed = 10f;
 
-    float yaw = 0f;
-    float pitch = 20f;
+    [Header("回転設定")]
+    public float mouseSensitivity = 3.0f;
+    public float cameraRotateSpeed = 120f;
 
-    void Start()
+    [Header("壁衝突設定")]
+    [SerializeField] private LayerMask collisionLayer;
+    [SerializeField] private float cameraRadius = 0.25f;
+    [SerializeField] private float wallOffset = 0.15f;
+    [SerializeField] private float returnSpeed = 8.0f;
+
+    private float yaw = 0f;
+    private float pitch = 20f;
+
+    private float currentDistance;
+
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        currentDistance = distance;
     }
 
-    void Update()
+    private void Update()
     {
         if (Keyboard.current != null &&
             Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -32,12 +45,12 @@ public class CameraScript : MonoBehaviour
         RotateCamera();
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         FollowCamera();
     }
 
-    void RotateCamera()
+    private void RotateCamera()
     {
         Vector2 input = Vector2.zero;
 
@@ -68,7 +81,8 @@ public class CameraScript : MonoBehaviour
         // コントローラー右スティック
         if (Gamepad.current != null)
         {
-            Vector2 stick = Gamepad.current.rightStick.ReadValue();
+            Vector2 stick =
+                Gamepad.current.rightStick.ReadValue();
 
             if (stick.magnitude >= 0.15f)
             {
@@ -81,35 +95,119 @@ public class CameraScript : MonoBehaviour
 
         if (Mouse.current != null)
         {
-            mouseInput = Mouse.current.delta.ReadValue();
+            mouseInput =
+                Mouse.current.delta.ReadValue();
         }
 
-        // 矢印キー・右スティック
-        yaw += input.x * cameraRotateSpeed * Time.deltaTime;
-        pitch -= input.y * cameraRotateSpeed * Time.deltaTime;
+        yaw +=
+            input.x *
+            cameraRotateSpeed *
+            Time.deltaTime;
 
-        // マウス
-        yaw += mouseInput.x * mouseSensitivity * 0.02f;
-        pitch -= mouseInput.y * mouseSensitivity * 0.02f;
+        pitch -=
+            input.y *
+            cameraRotateSpeed *
+            Time.deltaTime;
 
-        pitch = Mathf.Clamp(pitch, -30f, 70f);
+        yaw +=
+            mouseInput.x *
+            mouseSensitivity *
+            0.02f;
+
+        pitch -=
+            mouseInput.y *
+            mouseSensitivity *
+            0.02f;
+
+        pitch =
+            Mathf.Clamp(
+                pitch,
+                -30f,
+                70f);
     }
 
-    void FollowCamera()
+    private void FollowCamera()
     {
-        if (target == null) return;
+        if (target == null)
+        {
+            return;
+        }
 
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+        Quaternion rotation =
+            Quaternion.Euler(
+                pitch,
+                yaw,
+                0f);
 
-        Vector3 offset = rotation * new Vector3(0, height, -distance);
+        Vector3 lookTarget =
+            target.position +
+            Vector3.up * 1.5f;
 
-        Vector3 targetPos = target.position + offset;
+        Vector3 cameraDirection =
+            rotation *
+            new Vector3(
+                0f,
+                height,
+                -distance);
 
-        transform.position = Vector3.Lerp(
-            transform.position,
-            targetPos,
-            followSpeed * Time.deltaTime);
+        Vector3 desiredPosition =
+            target.position +
+            cameraDirection;
 
-        transform.LookAt(target.position + Vector3.up * 1.5f);
+        Vector3 directionFromTarget =
+            desiredPosition -
+            lookTarget;
+
+        float desiredDistance =
+            directionFromTarget.magnitude;
+
+        Vector3 normalizedDirection =
+            directionFromTarget.normalized;
+
+        float targetDistance =
+            desiredDistance;
+
+        RaycastHit hit;
+
+        if (Physics.SphereCast(
+            lookTarget,
+            cameraRadius,
+            normalizedDirection,
+            out hit,
+            desiredDistance,
+            collisionLayer,
+            QueryTriggerInteraction.Ignore))
+        {
+            targetDistance =
+                Mathf.Max(
+                    hit.distance - wallOffset,
+                    0.3f);
+        }
+
+        float distanceChangeSpeed =
+            targetDistance < currentDistance
+                ? followSpeed
+                : returnSpeed;
+
+        currentDistance =
+            Mathf.Lerp(
+                currentDistance,
+                targetDistance,
+                distanceChangeSpeed *
+                Time.deltaTime);
+
+        Vector3 correctedPosition =
+            lookTarget +
+            normalizedDirection *
+            currentDistance;
+
+        transform.position =
+            Vector3.Lerp(
+                transform.position,
+                correctedPosition,
+                followSpeed *
+                Time.deltaTime);
+
+        transform.LookAt(lookTarget);
     }
 }
