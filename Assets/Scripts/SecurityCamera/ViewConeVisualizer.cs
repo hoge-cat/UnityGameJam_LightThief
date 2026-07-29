@@ -173,6 +173,30 @@ public class ViewConeVisualizer : MonoBehaviour
         viewMesh.RecalculateBounds();
     }
 
+    public void SetViewSettings(
+    float distance,
+    float angle)
+    {
+        bool needsUpdate = false;
+
+        if (!Mathf.Approximately(viewDistance, distance))
+        {
+            viewDistance = distance;
+            needsUpdate = true;
+        }
+
+        if (!Mathf.Approximately(viewAngle, angle))
+        {
+            viewAngle = angle;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate)
+        {
+            CreateMesh();
+        }
+    }
+
     public void SetViewState(ViewState state)
     {
         if (meshRenderer == null)

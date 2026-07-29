@@ -9,8 +9,13 @@ public class SecurityCameraVision : MonoBehaviour
 
     [Header("視野設定")]
     [SerializeField] private float detectionDistance = 8.0f;
+
     [SerializeField, Range(0.0f, 360.0f)]
     private float viewAngle = 60.0f;
+
+    [Header("ライトによる発見距離補正")]
+    [SerializeField] private float lightOnMultiplier = 1.5f;
+    [SerializeField] private float lightOffMultiplier = 0.6f;
 
     [Header("障害物設定")]
     [SerializeField] private LayerMask obstacleLayer;
@@ -18,8 +23,9 @@ public class SecurityCameraVision : MonoBehaviour
     [Header("警戒設定")]
     [SerializeField] private float alertTime = 1.0f;
 
-    private float detectionTimer;
+    private FlashlightController flashlightController;
 
+    private float detectionTimer;
     private bool canSeePlayer;
 
     private void Start()
@@ -39,10 +45,32 @@ public class SecurityCameraVision : MonoBehaviour
                     "SecurityCameraVision：Playerタグのオブジェクトが見つかりません。");
             }
         }
+
+        if (player != null)
+        {
+            flashlightController =
+                player.GetComponentInChildren<FlashlightController>();
+
+            if (flashlightController == null)
+            {
+                Debug.LogWarning(
+                    "SecurityCameraVision：FlashlightControllerが見つかりません。");
+            }
+        }
     }
 
     private void Update()
     {
+        float currentDetectionDistance =
+            GetCurrentDetectionDistance();
+
+        if (viewConeVisualizer != null)
+        {
+            viewConeVisualizer.SetViewSettings(
+                currentDetectionDistance,
+                viewAngle);
+        }
+
         bool isPlayerVisible = CheckCanSeePlayer();
 
         if (isPlayerVisible)
@@ -89,77 +117,96 @@ public class SecurityCameraVision : MonoBehaviour
     }
 
     private bool CheckCanSeePlayer()
-{
-    if (visionOrigin == null || player == null)
     {
-        return false;
-    }
+        if (visionOrigin == null || player == null)
+        {
+            return false;
+        }
 
-    Vector3 directionToPlayer =
-        player.position - visionOrigin.position;
+        Vector3 directionToPlayer =
+            player.position - visionOrigin.position;
 
-    /*
-     * 距離と角度の判定では高さを無視する。
-     * 床に表示している扇形と同じ水平面で判定するため。
-     */
-    Vector3 horizontalDirectionToPlayer =
-        new Vector3(
-            directionToPlayer.x,
-            0.0f,
-            directionToPlayer.z);
+        /*
+         * 距離と角度の判定では高さを無視する。
+         * 床に表示している扇形と同じ水平面で判定するため。
+         */
+        Vector3 horizontalDirectionToPlayer =
+            new Vector3(
+                directionToPlayer.x,
+                0.0f,
+                directionToPlayer.z);
 
-    float horizontalDistance =
-        horizontalDirectionToPlayer.magnitude;
+        float horizontalDistance =
+            horizontalDirectionToPlayer.magnitude;
 
-    if (horizontalDistance > detectionDistance)
-    {
-        return false;
-    }
+        float currentDetectionDistance =
+            GetCurrentDetectionDistance();
 
-    if (horizontalDistance <= 0.01f)
-    {
+        if (horizontalDistance > currentDetectionDistance)
+        {
+            return false;
+        }
+
+        if (horizontalDistance <= 0.01f)
+        {
+            return true;
+        }
+
+        Vector3 horizontalForward =
+            new Vector3(
+                visionOrigin.forward.x,
+                0.0f,
+                visionOrigin.forward.z).normalized;
+
+        Vector3 normalizedHorizontalDirection =
+            horizontalDirectionToPlayer.normalized;
+
+        float angleToPlayer =
+            Vector3.Angle(
+                horizontalForward,
+                normalizedHorizontalDirection);
+
+        if (angleToPlayer > viewAngle * 0.5f)
+        {
+            return false;
+        }
+
+        /*
+         * 障害物判定は実際の高さを使う。
+         * カメラからプレイヤーへ直接Rayを飛ばす。
+         */
+        float actualDistance =
+            directionToPlayer.magnitude;
+
+        Vector3 actualDirection =
+            directionToPlayer.normalized;
+
+        if (Physics.Raycast(
+            visionOrigin.position,
+            actualDirection,
+            actualDistance,
+            obstacleLayer))
+        {
+            return false;
+        }
+
         return true;
     }
 
-    Vector3 horizontalForward =
-        new Vector3(
-            visionOrigin.forward.x,
-            0.0f,
-            visionOrigin.forward.z).normalized;
-
-    Vector3 normalizedHorizontalDirection =
-        horizontalDirectionToPlayer.normalized;
-
-    float angleToPlayer = Vector3.Angle(
-        horizontalForward,
-        normalizedHorizontalDirection);
-
-    if (angleToPlayer > viewAngle * 0.5f)
+    private float GetCurrentDetectionDistance()
     {
-        return false;
+        if (flashlightController == null)
+        {
+            return detectionDistance;
+        }
+
+        if (flashlightController.IsLightOn())
+        {
+            return detectionDistance * lightOnMultiplier;
+        }
+
+        return detectionDistance * lightOffMultiplier;
     }
-
-    /*
-     * 障害物判定は実際の高さを使う。
-     * カメラからプレイヤーへ直接Rayを飛ばす。
-     */
-    float actualDistance =
-        directionToPlayer.magnitude;
-
-    Vector3 actualDirection =
-        directionToPlayer.normalized;
-
-    if (Physics.Raycast(
-        visionOrigin.position,
-        actualDirection,
-        actualDistance,
-        obstacleLayer))
-    {
-        return false;
-    }
-
-    return true;
-}
 
     private void OnDrawGizmosSelected()
     {
@@ -168,10 +215,15 @@ public class SecurityCameraVision : MonoBehaviour
             return;
         }
 
+        float currentDetectionDistance =
+            Application.isPlaying
+                ? GetCurrentDetectionDistance()
+                : detectionDistance;
+
         Gizmos.color =
             Application.isPlaying && canSeePlayer
-            ? Color.red
-            : Color.yellow;
+                ? Color.red
+                : Color.yellow;
 
         Vector3 origin =
             visionOrigin.position;
@@ -192,30 +244,31 @@ public class SecurityCameraVision : MonoBehaviour
 
         Gizmos.DrawLine(
             origin,
-            origin + leftDirection * detectionDistance);
+            origin + leftDirection * currentDetectionDistance);
 
         Gizmos.DrawLine(
             origin,
-            origin + rightDirection * detectionDistance);
+            origin + rightDirection * currentDetectionDistance);
 
         const int segmentCount = 30;
 
         Vector3 previousPoint =
-            origin + leftDirection * detectionDistance;
+            origin + leftDirection * currentDetectionDistance;
 
         for (int i = 1; i <= segmentCount; i++)
         {
-            float angle = Mathf.Lerp(
-                -viewAngle * 0.5f,
-                viewAngle * 0.5f,
-                i / (float)segmentCount);
+            float angle =
+                Mathf.Lerp(
+                    -viewAngle * 0.5f,
+                    viewAngle * 0.5f,
+                    i / (float)segmentCount);
 
             Vector3 direction =
                 Quaternion.Euler(0.0f, angle, 0.0f)
                 * visionOrigin.forward;
 
             Vector3 currentPoint =
-                origin + direction * detectionDistance;
+                origin + direction * currentDetectionDistance;
 
             Gizmos.DrawLine(
                 previousPoint,
@@ -226,9 +279,10 @@ public class SecurityCameraVision : MonoBehaviour
 
         if (Application.isPlaying && player != null)
         {
-            Gizmos.color = canSeePlayer
-                ? Color.red
-                : Color.gray;
+            Gizmos.color =
+                canSeePlayer
+                    ? Color.red
+                    : Color.gray;
 
             Gizmos.DrawLine(
                 visionOrigin.position,

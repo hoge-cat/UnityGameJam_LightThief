@@ -28,7 +28,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private bool startWithChase;
 
     [Header("見失い設定")]
-    [SerializeField] private float loseSightTime = 3.0f;
+    [SerializeField] private float lightOnLoseSightTime = 4.0f;
+    [SerializeField] private float lightOffLoseSightTime = 1.5f;
 
     [Header("移動速度")]
     [SerializeField] private float patrolSpeed = 1.5f;
@@ -39,11 +40,37 @@ public class EnemyController : MonoBehaviour
     private EnemyState currentState;
     private float loseSightTimer;
 
+    private FlashlightController flashlightController;
+
     // 監視カメラから生成された敵か
     private bool isCameraSpawnedEnemy;
 
     // この敵を生成した監視カメラ
     private SecurityCameraAlarm sourceCameraAlarm;
+
+    private void Awake()
+    {
+        agent = GetComponent<NavMeshAgent>();
+
+        if (batteryManager == null)
+        {
+            batteryManager =
+                FindFirstObjectByType<BatteryManager>();
+        }
+
+        FlashlightController foundFlashlight =
+            FindFirstObjectByType<FlashlightController>();
+
+        if (foundFlashlight != null)
+        {
+            flashlightController = foundFlashlight;
+        }
+        else
+        {
+            Debug.LogWarning(
+                "EnemyController：FlashlightControllerが見つかりません。");
+        }
+    }
 
     private void Start()
     {
@@ -101,7 +128,10 @@ public class EnemyController : MonoBehaviour
         {
             loseSightTimer += Time.deltaTime;
 
-            if (loseSightTimer >= loseSightTime)
+            float currentLoseSightTime =
+                GetCurrentLoseSightTime();
+
+            if (loseSightTimer >= currentLoseSightTime)
             {
                 if (isCameraSpawnedEnemy)
                 {
@@ -133,8 +163,22 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        // ここでタイマーを0に戻さない
         enemyChase.UpdateChase();
+    }
+
+    private float GetCurrentLoseSightTime()
+    {
+        if (flashlightController == null)
+        {
+            return lightOnLoseSightTime;
+        }
+
+        if (flashlightController.IsLightOn())
+        {
+            return lightOnLoseSightTime;
+        }
+
+        return lightOffLoseSightTime;
     }
 
     public void StartChasing()
@@ -214,17 +258,6 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        agent = GetComponent<NavMeshAgent>();
-
-        if (batteryManager == null)
-        {
-            batteryManager =
-                FindFirstObjectByType<BatteryManager>();
-        }
-    }
-
     private void AttackPlayer()
     {
         if (enemyAnimator != null)
@@ -240,8 +273,7 @@ public class EnemyController : MonoBehaviour
         if (batteryManager != null)
         {
             batteryManager.DrainBattery(
-                attackBatteryDamage
-            );
+                attackBatteryDamage);
         }
 
         Debug.Log("Enemyが攻撃しました");
