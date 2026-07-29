@@ -45,6 +45,15 @@ public class PlayerScript : MonoBehaviour
         rb.constraints =
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationZ;
+
+        // コナミコマンド成功時は移動速度を5倍
+        if (CheatMode.IsEnabled)
+        {
+            moveSpeed *= 5.0f;
+            dashSpeed *= 5.0f;
+
+            Debug.Log("チート：プレイヤー移動速度5倍");
+        }
     }
 
     private void Update()
