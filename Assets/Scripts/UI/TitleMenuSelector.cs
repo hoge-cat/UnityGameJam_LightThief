@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class TitleMenuSelector : MonoBehaviour
 {
@@ -11,10 +12,17 @@ public class TitleMenuSelector : MonoBehaviour
     [Header("メニュー音")]
     [SerializeField] private TitleMenuSounds menuSounds;
 
+    [Header("選択するボタン")]
+    [SerializeField] private List<Button> menuButtons;
+
+    private int currentIndex = 0;
+
     private GameObject previousSelectedObject;
 
     private void Start()
     {
+        currentIndex = 0;
+
         SelectFirstButton();
 
         if (EventSystem.current != null)
@@ -29,19 +37,26 @@ public class TitleMenuSelector : MonoBehaviour
         RestoreSelection();
         ReadSubmitInput();
 
-        if (EventSystem.current == null)
+        if (Keyboard.current != null)
         {
-            return;
+            if (Keyboard.current.sKey.wasPressedThisFrame ||
+                Keyboard.current.downArrowKey.wasPressedThisFrame)
+            {
+                ChangeSelection(1);
+            }
+
+            if (Keyboard.current.wKey.wasPressedThisFrame ||
+                Keyboard.current.upArrowKey.wasPressedThisFrame)
+            {
+                ChangeSelection(-1);
+            }
         }
 
-        GameObject currentSelectedObject =
-            EventSystem.current.currentSelectedGameObject;
-
-        if (currentSelectedObject != null &&
-            currentSelectedObject != previousSelectedObject)
+        // 決定キー
+        if (Keyboard.current != null &&
+     Keyboard.current.enterKey.wasPressedThisFrame)
         {
-            menuSounds?.PlayMove();
-            previousSelectedObject = currentSelectedObject;
+            PressSelectedButton();
         }
     }
 
@@ -146,5 +161,61 @@ public class TitleMenuSelector : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(
             firstSelectedButton.gameObject
         );
+    }
+
+    private void ChangeSelection(int direction)
+    {
+        if (menuButtons == null || menuButtons.Count == 0)
+        {
+            return;
+        }
+
+        currentIndex += direction;
+
+        if (currentIndex < 0)
+        {
+            currentIndex = menuButtons.Count - 1;
+        }
+
+        if (currentIndex >= menuButtons.Count)
+        {
+            currentIndex = 0;
+        }
+
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        EventSystem.current.SetSelectedGameObject(
+            menuButtons[currentIndex].gameObject
+        );
+
+        menuSounds?.PlayMove();
+    }
+
+    private void PressSelectedButton()
+    {
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        GameObject selected =
+            EventSystem.current.currentSelectedGameObject;
+
+        if (selected == null)
+        {
+            return;
+        }
+
+        menuSounds?.PlayDecide();
+
+        Button button = selected.GetComponent<Button>();
+
+        if (button != null)
+        {
+            button.onClick.Invoke();
+        }
     }
 }
