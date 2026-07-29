@@ -9,6 +9,8 @@ public class GoalDoor : MonoBehaviour
     [Header("ゴール判定")]
     [SerializeField] private Collider goalTriggerCollider;
 
+    [SerializeField] private GameObject goalLightObject;
+
     private bool isUnlocked;
 
     private void Start()
@@ -42,6 +44,11 @@ public class GoalDoor : MonoBehaviour
             goalTriggerCollider.enabled = true;
         }
 
+        if (goalLightObject != null)
+        {
+            goalLightObject.SetActive(true);
+        }
+
         Debug.Log("ゴールが解放されました");
     }
 
@@ -64,6 +71,11 @@ public class GoalDoor : MonoBehaviour
         if (goalTriggerCollider != null)
         {
             goalTriggerCollider.enabled = false;
+        }
+
+        if (goalLightObject != null)
+        {
+            goalLightObject.SetActive(false);
         }
     }
 
