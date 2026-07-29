@@ -28,14 +28,25 @@ public class BatteryManager : MonoBehaviour
     {
         if (flashlightOn && !IsEmpty())
         {
-            DrainBattery(drainSpeed * Time.deltaTime);
+            DrainBattery(
+                drainSpeed * Time.deltaTime
+            );
         }
 
         if (IsEmpty())
         {
             flashlightOn = false;
 
-            SceneManager.LoadScene("GameOver");
+            // ゴール処理開始後は
+            // フェード中にバッテリーが切れても
+            // ゲームオーバーにしない
+            if (!GoalTrigger.IsClearing)
+            {
+                SceneManager.LoadScene(
+                    "GameOver"
+                );
+            }
+
             return;
         }
 
@@ -109,7 +120,9 @@ public class BatteryManager : MonoBehaviour
         {
             batteryText.text =
                 "BATTERY\n" +
-                Mathf.CeilToInt(currentBattery) +
+                Mathf.CeilToInt(
+                    currentBattery
+                ) +
                 "%";
         }
     }

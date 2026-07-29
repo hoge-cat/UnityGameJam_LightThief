@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class GoalTrigger : MonoBehaviour
 {
+    public static bool IsClearing { get; private set; }
+
     [Header("ゴール参照")]
     [SerializeField] private GoalDoor goalDoor;
 
@@ -10,6 +12,11 @@ public class GoalTrigger : MonoBehaviour
     [SerializeField] private string resultSceneName = "GameClear";
 
     private bool hasCleared;
+
+    private void Awake()
+    {
+        IsClearing = false;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -23,12 +30,16 @@ public class GoalTrigger : MonoBehaviour
             return;
         }
 
-        if (goalDoor == null || !goalDoor.IsUnlocked())
+        if (goalDoor == null ||
+            !goalDoor.IsUnlocked())
         {
             return;
         }
 
+        // フェードより先にクリア処理中へ切り替える
         hasCleared = true;
+        IsClearing = true;
+
         Time.timeScale = 1.0f;
 
         if (ScreenFader.Instance != null)
