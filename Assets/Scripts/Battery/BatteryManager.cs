@@ -26,16 +26,30 @@ public class BatteryManager : MonoBehaviour
 
     private void Update()
     {
+        // チート中は常に満タン
+        if (CheatMode.IsEnabled)
+        {
+            currentBattery = maxBattery;
+            UpdateUI();
+            return;
+        }
+
         if (flashlightOn && !IsEmpty())
         {
-            DrainBattery(drainSpeed * Time.deltaTime);
+            DrainBattery(
+                drainSpeed * Time.deltaTime);
         }
 
         if (IsEmpty())
         {
             flashlightOn = false;
 
-            SceneManager.LoadScene("GameOver");
+            if (!GoalTrigger.IsClearing)
+            {
+                SceneManager.LoadScene(
+                    "GameOver");
+            }
+
             return;
         }
 
@@ -60,6 +74,12 @@ public class BatteryManager : MonoBehaviour
 
     public void DrainBattery(float amount)
     {
+        if (CheatMode.IsEnabled)
+        {
+            currentBattery = maxBattery;
+            return;
+        }
+
         currentBattery -= amount;
 
         currentBattery = Mathf.Clamp(
@@ -94,6 +114,11 @@ public class BatteryManager : MonoBehaviour
 
     public bool IsEmpty()
     {
+        if (CheatMode.IsEnabled)
+        {
+            return false;
+        }
+
         return currentBattery <= 0.0f;
     }
 
@@ -109,7 +134,9 @@ public class BatteryManager : MonoBehaviour
         {
             batteryText.text =
                 "BATTERY\n" +
-                Mathf.CeilToInt(currentBattery) +
+                Mathf.CeilToInt(
+                    currentBattery
+                ) +
                 "%";
         }
     }

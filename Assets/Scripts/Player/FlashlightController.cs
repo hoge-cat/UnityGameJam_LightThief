@@ -17,7 +17,17 @@ public class FlashlightController : MonoBehaviour
     {
         if (flashlight == null)
         {
-            flashlight = GetComponentInChildren<Light>();
+            flashlight =
+                GetComponentInChildren<Light>();
+        }
+
+        // コナミコマンド成功時は明るさを3倍
+        if (CheatMode.IsEnabled &&
+            flashlight != null)
+        {
+            flashlight.intensity *= 3.0f;
+
+            Debug.Log("チート：懐中電灯の明るさ3倍");
         }
 
         isLightOn = startWithLightOn;
@@ -25,7 +35,8 @@ public class FlashlightController : MonoBehaviour
 
         if (batteryManager != null)
         {
-            batteryManager.SetFlashlightState(isLightOn);
+            batteryManager.SetFlashlightState(
+                isLightOn);
         }
     }
 
