@@ -97,8 +97,8 @@ public class DoorController : MonoBehaviour
             Keyboard.current.eKey.wasPressedThisFrame;
 
         bool gamepadPressed =
-            Gamepad.current != null &&
-            Gamepad.current.buttonNorth.wasPressedThisFrame;
+    Gamepad.current != null &&
+    Gamepad.current.buttonEast.wasPressedThisFrame;
 
         if (keyboardPressed || gamepadPressed)
         {
