@@ -100,13 +100,24 @@ public class SecurityCameraVision : MonoBehaviour
         }
         else
         {
-            detectionTimer = 0.0f;
+            // 一瞬判定が途切れても、警戒時間を即座に0へ戻さない
+            detectionTimer -= Time.deltaTime * 2.0f;
+            detectionTimer = Mathf.Max(0.0f, detectionTimer);
+
             canSeePlayer = false;
 
             if (viewConeVisualizer != null)
             {
-                viewConeVisualizer.SetViewState(
-                    ViewConeVisualizer.ViewState.Normal);
+                if (detectionTimer > 0.0f)
+                {
+                    viewConeVisualizer.SetViewState(
+                        ViewConeVisualizer.ViewState.Warning);
+                }
+                else
+                {
+                    viewConeVisualizer.SetViewState(
+                        ViewConeVisualizer.ViewState.Normal);
+                }
             }
         }
     }
@@ -123,13 +134,14 @@ public class SecurityCameraVision : MonoBehaviour
             return false;
         }
 
-        Vector3 directionToPlayer =
-            player.position - visionOrigin.position;
+        // プレイヤーの足元ではなく、胴体付近を見る
+        Vector3 playerTarget =
+            player.position + Vector3.up * 1.0f;
 
-        /*
-         * 距離と角度の判定では高さを無視する。
-         * 床に表示している扇形と同じ水平面で判定するため。
-         */
+        Vector3 directionToPlayer =
+            playerTarget - visionOrigin.position;
+
+        // 距離・角度判定では高さを無視
         Vector3 horizontalDirectionToPlayer =
             new Vector3(
                 directionToPlayer.x,
@@ -142,7 +154,8 @@ public class SecurityCameraVision : MonoBehaviour
         float currentDetectionDistance =
             GetCurrentDetectionDistance();
 
-        if (horizontalDistance > currentDetectionDistance)
+        if (horizontalDistance >
+            currentDetectionDistance)
         {
             return false;
         }
@@ -156,36 +169,39 @@ public class SecurityCameraVision : MonoBehaviour
             new Vector3(
                 visionOrigin.forward.x,
                 0.0f,
-                visionOrigin.forward.z).normalized;
+                visionOrigin.forward.z);
 
-        Vector3 normalizedHorizontalDirection =
-            horizontalDirectionToPlayer.normalized;
+        if (horizontalForward.sqrMagnitude <= 0.001f)
+        {
+            return false;
+        }
+
+        horizontalForward.Normalize();
 
         float angleToPlayer =
             Vector3.Angle(
                 horizontalForward,
-                normalizedHorizontalDirection);
+                horizontalDirectionToPlayer.normalized);
 
         if (angleToPlayer > viewAngle * 0.5f)
         {
             return false;
         }
 
-        /*
-         * 障害物判定は実際の高さを使う。
-         * カメラからプレイヤーへ直接Rayを飛ばす。
-         */
         float actualDistance =
             directionToPlayer.magnitude;
 
         Vector3 actualDirection =
             directionToPlayer.normalized;
 
+        // プレイヤーの胴体へRayを飛ばして障害物を確認
         if (Physics.Raycast(
             visionOrigin.position,
             actualDirection,
+            out RaycastHit hit,
             actualDistance,
-            obstacleLayer))
+            obstacleLayer,
+            QueryTriggerInteraction.Ignore))
         {
             return false;
         }

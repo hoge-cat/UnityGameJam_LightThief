@@ -56,10 +56,17 @@ public class DoorController : MonoBehaviour
             return;
         }
 
+        Vector3 playerPosition = player.position;
+        Vector3 doorPosition = transform.position;
+
+        // 高さの違いを無視して、床の上での距離だけを測る
+        playerPosition.y = 0.0f;
+        doorPosition.y = 0.0f;
+
         float distanceToPlayer =
             Vector3.Distance(
-                player.position,
-                transform.position);
+                playerPosition,
+                doorPosition);
 
         bool isPlayerInRange =
             distanceToPlayer <= interactionDistance;
@@ -67,6 +74,8 @@ public class DoorController : MonoBehaviour
         // ドアの範囲に入った瞬間
         if (isPlayerInRange && !wasPlayerInRange)
         {
+            Debug.Log("Door Prompt");
+
             TutorialUIManager.Instance?.ShowDoorPrompt(isOpen);
         }
 
