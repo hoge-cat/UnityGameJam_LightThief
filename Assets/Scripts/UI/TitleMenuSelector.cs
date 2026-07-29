@@ -50,6 +50,13 @@ public class TitleMenuSelector : MonoBehaviour
                 ChangeSelection(-1);
             }
         }
+
+        // åàíËÉLÅ[
+        if (Keyboard.current != null &&
+     Keyboard.current.enterKey.wasPressedThisFrame)
+        {
+            PressSelectedButton();
+        }
     }
 
     private void RestoreSelection()
@@ -132,5 +139,30 @@ public class TitleMenuSelector : MonoBehaviour
         );
 
         menuSounds?.PlayMove();
+    }
+
+    private void PressSelectedButton()
+    {
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        GameObject selected =
+            EventSystem.current.currentSelectedGameObject;
+
+        if (selected == null)
+        {
+            return;
+        }
+
+        menuSounds?.PlayDecide();
+
+        Button button = selected.GetComponent<Button>();
+
+        if (button != null)
+        {
+            button.onClick.Invoke();
+        }
     }
 }

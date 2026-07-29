@@ -780,6 +780,7 @@ GameObject:
   - component: {fileID: 688328631}
   - component: {fileID: 688328630}
   - component: {fileID: 688328629}
+  - component: {fileID: 688328632}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -888,6 +889,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 688328627}
   m_CullTransparentMesh: 1
+--- !u!114 &688328632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688328627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc39ab44d3c708a458c9ef569a89fef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSelectEffect
+  selectedScale: 1.08
+  changeSpeed: 10
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -985,7 +1000,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1095,6 +1110,7 @@ GameObject:
   - component: {fileID: 1218401383}
   - component: {fileID: 1218401382}
   - component: {fileID: 1218401381}
+  - component: {fileID: 1218401384}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -1215,6 +1231,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1218401379}
   m_CullTransparentMesh: 1
+--- !u!114 &1218401384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218401379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc39ab44d3c708a458c9ef569a89fef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSelectEffect
+  selectedScale: 1.08
+  changeSpeed: 10
 --- !u!1 &1556318124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1271,6 +1301,7 @@ GameObject:
   - component: {fileID: 1877961375}
   - component: {fileID: 1877961374}
   - component: {fileID: 1877961373}
+  - component: {fileID: 1877961376}
   m_Layer: 5
   m_Name: HowToPlayButton
   m_TagString: Untagged
@@ -1379,6 +1410,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877961371}
   m_CullTransparentMesh: 1
+--- !u!114 &1877961376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877961371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc39ab44d3c708a458c9ef569a89fef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSelectEffect
+  selectedScale: 1.08
+  changeSpeed: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
