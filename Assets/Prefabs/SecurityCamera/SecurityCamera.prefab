@@ -93,8 +93,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ViewConeVisualizer
   visionOrigin: {fileID: 228670051224796043}
-  viewDistance: 12
-  viewAngle: 90
+  viewDistance: 10
+  viewAngle: 80
   viewMaterial: {fileID: 2100000, guid: a50b15af0cdec624794be7de5c5eccdd, type: 2}
   heightOffset: 0.03
   groundY: 0.1
